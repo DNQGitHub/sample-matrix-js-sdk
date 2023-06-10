@@ -4,12 +4,18 @@ import MatrixSdk, {
     ClientEvent,
     Room,
     ICreateClientOpts,
+    RoomEvent,
+    MatrixEvent,
 } from 'matrix-js-sdk';
 import { ISyncStateData, SyncState } from 'matrix-js-sdk/lib/sync';
 
 export type MatrixContextValue = {
-    startMatrixClient: (opts: ICreateClientOpts) => void;
     matrixClient?: MatrixClient;
+    rooms: Array<Room>;
+    selectedRoom?: Room;
+    startMatrixClient: (opts: ICreateClientOpts) => void;
+    stopMatrixClient: () => void;
+    setSelectedRoom: (room: Room) => void;
 };
 
 export type MatrixProviderProps = PropsWithChildren<{}>;
@@ -20,17 +26,13 @@ export const MatrixContext = React.createContext<MatrixContextValue>(
 
 export const MatrixProvider = ({ children }: MatrixProviderProps) => {
     const [matrixClient, setMatrixClient] = React.useState<MatrixClient>();
-
-    React.useEffect(() => {
-        return () => {
-            if (matrixClient) matrixClient.removeAllListeners();
-        };
-    }, []);
+    const [rooms, setRooms] = React.useState<Array<Room>>([]);
+    const [selectedRoom, setSelectedRoom] = React.useState<Room>();
 
     const startMatrixClient = (opts: ICreateClientOpts) => {
         const matrixClient = MatrixSdk.createClient(opts);
 
-        matrixClient.addListener(
+        matrixClient.once(
             ClientEvent.Sync,
             (
                 state: SyncState,
@@ -38,23 +40,53 @@ export const MatrixProvider = ({ children }: MatrixProviderProps) => {
                 data?: ISyncStateData
             ) => {
                 console.log('sync-event', { state, lastState, data });
+                const rooms = matrixClient.getRooms();
+                setRooms(rooms);
             }
         );
 
-        matrixClient.addListener(ClientEvent.Room, (room: Room) => {
+        matrixClient.on(ClientEvent.Room, (room: Room) => {
             console.log('room-event', { room });
         });
+
+        matrixClient.on(
+            RoomEvent.Timeline,
+            (event: MatrixEvent, room?: Room, toStartOfTimeline?: boolean) => {
+                console.log('room-timeline-event', {
+                    event,
+                    room,
+                    toStartOfTimeline,
+                });
+
+                const rooms = matrixClient.getRooms();
+                setRooms(rooms);
+            }
+        );
 
         matrixClient.startClient();
 
         setMatrixClient(matrixClient);
     };
 
+    const stopMatrixClient = () => {
+        if (!matrixClient) return;
+
+        matrixClient.removeAllListeners();
+        matrixClient.stopClient();
+        setSelectedRoom(undefined);
+        setRooms([]);
+        setMatrixClient(undefined);
+    };
+
     return (
         <MatrixContext.Provider
             value={{
                 matrixClient,
+                rooms,
+                selectedRoom,
                 startMatrixClient,
+                stopMatrixClient,
+                setSelectedRoom,
             }}
         >
             {children}
