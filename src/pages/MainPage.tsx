@@ -10,7 +10,7 @@ import {
 } from '@mantine/core';
 import { useMatrixContext } from '../contexts';
 import dayJs from 'dayjs';
-import { MatrixEvent, Preset } from 'matrix-js-sdk';
+import { Preset } from 'matrix-js-sdk';
 import { resolvePromise } from '../utils';
 
 /**
@@ -69,6 +69,19 @@ export const MainPage = () => {
                 console.log('create room', {
                     roomId: getRoomIdForAliasRes.room_id,
                 });
+
+                let existedRoom = null;
+                do {
+                    existedRoom = matrixClient.getRoom(
+                        getRoomIdForAliasRes.room_id
+                    );
+                    console.log('--->', { existedRoom });
+
+                    if (existedRoom) {
+                        setSelectedRoom(existedRoom);
+                        break;
+                    }
+                } while (!existedRoom);
 
                 return;
             }
@@ -129,6 +142,19 @@ export const MainPage = () => {
                 console.log('create room', {
                     roomId: getRoomIdForAliasRes.room_id,
                 });
+
+                let existedRoom = null;
+                do {
+                    existedRoom = matrixClient.getRoom(
+                        getRoomIdForAliasRes.room_id
+                    );
+                    console.log('--->', { existedRoom });
+
+                    if (existedRoom) {
+                        setSelectedRoom(existedRoom);
+                        break;
+                    }
+                } while (!existedRoom);
 
                 return;
             }
@@ -244,17 +270,48 @@ export const MainPage = () => {
 };
 
 const ListRooms = () => {
-    const { rooms, setSelectedRoom } = useMatrixContext();
+    const { rooms, selectedRoom, setSelectedRoom } = useMatrixContext();
 
     return (
         <Flex direction="column" gap={5}>
-            {rooms.map((r) => (
-                <Button key={r.roomId} onClick={() => setSelectedRoom(r)}>
-                    <Text>
-                        {r.name} - ( {r.roomId} )
-                    </Text>
-                </Button>
-            ))}
+            {rooms.map((r) => {
+                const lastEvent =
+                    r.timeline?.[r.timeline.length - 1].event || {};
+
+                return (
+                    <Button
+                        styles={{
+                            inner: {
+                                justifyContent: 'flex-start',
+                            },
+                        }}
+                        h="auto"
+                        p={10}
+                        key={r.roomId}
+                        onClick={() => setSelectedRoom(r)}
+                        style={{
+                            borderWidth: 5,
+                            borderColor:
+                                r.roomId === selectedRoom?.roomId
+                                    ? '#06325a'
+                                    : undefined,
+                        }}
+                    >
+                        <Flex w="100%" direction="column" gap={5}>
+                            <Text transform="uppercase" color="#06325a">
+                                {r.name} - ( {r.roomId} )
+                            </Text>
+                            <Text>
+                                [{lastEvent?.sender?.split(':')?.[0]}] |{' '}
+                                {dayJs(lastEvent?.origin_server_ts).fromNow()}:{' '}
+                            </Text>
+                            <Text ml={20}>
+                                {JSON.stringify(lastEvent?.content, null, 4)}
+                            </Text>
+                        </Flex>
+                    </Button>
+                );
+            })}
         </Flex>
     );
 };
