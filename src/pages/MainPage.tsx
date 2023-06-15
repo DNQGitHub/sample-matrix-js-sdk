@@ -22,6 +22,7 @@ import { resolvePromise } from '../utils';
 export const MainPage = () => {
     const {
         matrixClient,
+        selectedRoom,
         startMatrixClient,
         stopMatrixClient,
         setSelectedRoom,
@@ -107,6 +108,68 @@ export const MainPage = () => {
         }
     };
 
+    const onButtonCreateGroupRoomClicked: MouseEventHandler<
+        HTMLButtonElement
+    > = async () => {
+        console.log('----> create group room button clicked');
+
+        try {
+            if (!matrixClient) return;
+
+            const userIds = ['gm.qtest1', 'gm.qtest2', 'gm.qtest4'];
+
+            const roomName = userIds.sort().join('_');
+
+            const roomAlias = `#${roomName}:matrix.tauhu.cloud`;
+
+            const [getRoomIdForAliasRes, getRoomIdForAliasErr] =
+                await resolvePromise(matrixClient.getRoomIdForAlias(roomAlias));
+
+            if (!getRoomIdForAliasErr && getRoomIdForAliasRes) {
+                console.log('create room', {
+                    roomId: getRoomIdForAliasRes.room_id,
+                });
+
+                return;
+            }
+
+            const [createRoomRes, createRoomErr] = await resolvePromise(
+                matrixClient.createRoom({
+                    is_direct: true,
+                    preset: Preset.TrustedPrivateChat,
+                    name: roomName,
+                    room_alias_name: roomName,
+                    invite: userIds
+                        .filter((userId) => userId != userIds[0])
+                        .map((userId) => `@${userId}:matrix.tauhu.cloud`),
+                })
+            );
+
+            console.log({ createRoomRes, createRoomErr });
+
+            if (createRoomErr || !createRoomRes) {
+                throw new Error(createRoomErr);
+            }
+
+            console.log('create room', {
+                roomId: createRoomRes.room_id,
+            });
+
+            let newRoom = null;
+            do {
+                newRoom = matrixClient.getRoom(createRoomRes.room_id);
+                console.log('--->', { newRoom });
+
+                if (newRoom) {
+                    setSelectedRoom(newRoom);
+                    break;
+                }
+            } while (!newRoom);
+        } catch (error: any) {
+            console.log('create room', { error });
+        }
+    };
+
     return (
         <Box>
             <Container>
@@ -133,6 +196,13 @@ export const MainPage = () => {
                     >
                         Create Room
                     </Button>
+
+                    <Button
+                        disabled={!!!matrixClient}
+                        onClick={onButtonCreateGroupRoomClicked}
+                    >
+                        Create Group Room
+                    </Button>
                 </Flex>
 
                 <Flex gap={10} mt={20} align="flex-start">
@@ -158,7 +228,10 @@ export const MainPage = () => {
                             borderRadius: 8,
                         }}
                     >
-                        <Text fw={700}>SELECTED ROOM</Text>
+                        <Text fw={700}>
+                            SELECTED ROOM - {selectedRoom?.name} - ({' '}
+                            {selectedRoom?.roomId} )
+                        </Text>
 
                         <SelectedRoom />
 
@@ -178,7 +251,7 @@ const ListRooms = () => {
             {rooms.map((r) => (
                 <Button key={r.roomId} onClick={() => setSelectedRoom(r)}>
                     <Text>
-                        {r.name} - ({r.roomId})
+                        {r.name} - ( {r.roomId} )
                     </Text>
                 </Button>
             ))}
