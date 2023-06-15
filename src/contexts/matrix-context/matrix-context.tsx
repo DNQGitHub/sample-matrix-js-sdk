@@ -40,8 +40,11 @@ export const MatrixProvider = ({ children }: MatrixProviderProps) => {
                 data?: ISyncStateData
             ) => {
                 console.log('sync-event', { state, lastState, data });
-                const rooms = matrixClient.getRooms();
-                setRooms(rooms);
+
+                if (state !== SyncState.Prepared) return;
+
+                setMatrixClient(matrixClient);
+                setRooms(matrixClient.getRooms());
             }
         );
 
@@ -64,8 +67,6 @@ export const MatrixProvider = ({ children }: MatrixProviderProps) => {
         );
 
         matrixClient.startClient();
-
-        setMatrixClient(matrixClient);
     };
 
     const stopMatrixClient = () => {

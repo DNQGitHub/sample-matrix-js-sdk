@@ -1,8 +1,17 @@
 import React, { MouseEventHandler } from 'react';
-import { Box, Button, Container, Flex, Text, Title } from '@mantine/core';
+import {
+    Box,
+    Button,
+    Container,
+    Flex,
+    Text,
+    TextInput,
+    Title,
+} from '@mantine/core';
 import { useMatrixContext } from '../contexts';
 import dayJs from 'dayjs';
-import { MatrixEvent, RoomEvent } from 'matrix-js-sdk';
+import { MatrixEvent, Preset } from 'matrix-js-sdk';
+import { resolvePromise } from '../utils';
 
 /**
  * @home_server https://matrix.tauhu.cloud
@@ -11,8 +20,12 @@ import { MatrixEvent, RoomEvent } from 'matrix-js-sdk';
  */
 
 export const MainPage = () => {
-    const { matrixClient, startMatrixClient, stopMatrixClient } =
-        useMatrixContext();
+    const {
+        matrixClient,
+        startMatrixClient,
+        stopMatrixClient,
+        setSelectedRoom,
+    } = useMatrixContext();
 
     const onButtonStartClicked: MouseEventHandler<
         HTMLButtonElement
@@ -22,7 +35,7 @@ export const MainPage = () => {
         startMatrixClient({
             baseUrl: 'https://matrix.tauhu.cloud',
             userId: '@gm.qtest1:matrix.tauhu.cloud',
-            accessToken: 'syt_Z20ucXRlc3Qx_ZYNarLrZqWzEjrGyYGYP_2t2iGs',
+            accessToken: 'syt_Z20ucXRlc3Qx_pSAbqeJzXYiXLAbiAKUy_1UWIWe',
         });
     };
 
@@ -34,26 +47,123 @@ export const MainPage = () => {
         stopMatrixClient();
     };
 
+    const onButtonCreateRoomClicked: MouseEventHandler<
+        HTMLButtonElement
+    > = async () => {
+        console.log('----> create room button clicked');
+
+        try {
+            if (!matrixClient) return;
+
+            const userIds = ['gm.qtest1', 'gm.qtest4'];
+
+            const roomName = userIds.sort().join('_');
+
+            const roomAlias = `#${roomName}:matrix.tauhu.cloud`;
+
+            const [getRoomIdForAliasRes, getRoomIdForAliasErr] =
+                await resolvePromise(matrixClient.getRoomIdForAlias(roomAlias));
+
+            if (!getRoomIdForAliasErr && getRoomIdForAliasRes) {
+                console.log('create room', {
+                    roomId: getRoomIdForAliasRes.room_id,
+                });
+
+                return;
+            }
+
+            const [createRoomRes, createRoomErr] = await resolvePromise(
+                matrixClient.createRoom({
+                    is_direct: true,
+                    preset: Preset.TrustedPrivateChat,
+                    name: roomName,
+                    room_alias_name: roomName,
+                    invite: [`@${userIds[1]}:matrix.tauhu.cloud`],
+                })
+            );
+
+            console.log({ createRoomRes, createRoomErr });
+
+            if (createRoomErr || !createRoomRes) {
+                throw new Error(createRoomErr);
+            }
+
+            console.log('create room', {
+                roomId: createRoomRes.room_id,
+            });
+
+            let newRoom = null;
+            do {
+                newRoom = matrixClient.getRoom(createRoomRes.room_id);
+                console.log('--->', { newRoom });
+
+                if (newRoom) {
+                    setSelectedRoom(newRoom);
+                    break;
+                }
+            } while (!newRoom);
+        } catch (error: any) {
+            console.log('create room', { error });
+        }
+    };
+
     return (
         <Box>
             <Container>
-                <Title>Main Page</Title>
+                <Title mb={20}>Main Page</Title>
 
-                <Button
-                    onClick={
-                        matrixClient
-                            ? onButtonStopClicked
-                            : onButtonStartClicked
-                    }
-                >
-                    {matrixClient
-                        ? `Stop - ${matrixClient?.getUserId()?.split(':')?.[0]}`
-                        : 'Start'}
-                </Button>
+                <Flex gap={10}>
+                    <Button
+                        onClick={
+                            matrixClient
+                                ? onButtonStopClicked
+                                : onButtonStartClicked
+                        }
+                    >
+                        {matrixClient
+                            ? `Stop - ${
+                                  matrixClient?.getUserId()?.split(':')?.[0]
+                              }`
+                            : 'Start'}
+                    </Button>
 
-                <Flex gap={10} mt={20}>
-                    <ListRooms />
-                    <SelectedRoom />
+                    <Button
+                        disabled={!!!matrixClient}
+                        onClick={onButtonCreateRoomClicked}
+                    >
+                        Create Room
+                    </Button>
+                </Flex>
+
+                <Flex gap={10} mt={20} align="flex-start">
+                    <Box
+                        p={10}
+                        style={{
+                            border: '1px solid black',
+                            borderRadius: 8,
+                        }}
+                    >
+                        <Text fw={700} mb={10}>
+                            ROOMS
+                        </Text>
+                        <ListRooms />
+                    </Box>
+
+                    <Flex
+                        direction="column"
+                        gap={15}
+                        p={10}
+                        style={{
+                            border: '1px solid black',
+                            borderRadius: 8,
+                        }}
+                    >
+                        <Text fw={700}>SELECTED ROOM</Text>
+
+                        <SelectedRoom />
+
+                        <MessageComposer />
+                    </Flex>
                 </Flex>
             </Container>
         </Box>
@@ -77,53 +187,72 @@ const ListRooms = () => {
 };
 
 const SelectedRoom = () => {
-    const { selectedRoom, matrixClient } = useMatrixContext();
-    const [roomEvents, setRoomEvents] = React.useState<Array<MatrixEvent>>([]);
-
-    React.useEffect(() => {
-        (async () => {
-            if (!selectedRoom) {
-                setRoomEvents([]);
-                return;
-            }
-
-            const response = await fetch(
-                `${matrixClient?.baseUrl}/_matrix/client/v3/rooms/${selectedRoom.roomId}/messages?dir=b&from=t1-38_0_0_0_0_0_0_0_0_0`,
-                {
-                    headers: {
-                        Authorization:
-                            'Bearer syt_Z20ucXRlc3Qx_ZYNarLrZqWzEjrGyYGYP_2t2iGs',
-                    },
-                }
-            );
-            const responseJson = await response.json();
-
-            console.log('selected ---->', { responseJson });
-        })();
-    }, [selectedRoom]);
+    const { selectedRoom } = useMatrixContext();
 
     if (!selectedRoom) {
         return <Text>No room selected</Text>;
     }
 
     return (
-        <Flex
-            direction="column"
-            gap={5}
-            p={10}
-            style={{ flex: 1, border: '1px solid black', borderRadius: 8 }}
+        <Box
+            mah={500}
+            style={{
+                overflowY: 'scroll',
+                border: '1px solid black',
+                borderRadius: 8,
+            }}
         >
-            {selectedRoom.timeline.map((t) => (
-                <Flex key={t.getId()} direction="column">
-                    <Text>
-                        [{t.event.sender?.split(':')?.[0]}] |{' '}
-                        {dayJs(t.event.origin_server_ts).format('YYYY-MM-DD')}:{' '}
-                    </Text>
-                    <Text ml={20}>
-                        {JSON.stringify(t.event.content, null, 4)}
-                    </Text>
-                </Flex>
-            ))}
+            <Flex direction="column" gap={15} p={10}>
+                {selectedRoom.timeline.map((t) => (
+                    <Flex key={t.getId()} direction="column">
+                        <Text>
+                            [{t.event.sender?.split(':')?.[0]}] |{' '}
+                            {dayJs(t.event.origin_server_ts).format(
+                                'YYYY-MM-DD'
+                            )}
+                            :{' '}
+                        </Text>
+                        <Text ml={20}>
+                            {JSON.stringify(t.event.content, null, 4)}
+                        </Text>
+                    </Flex>
+                ))}
+            </Flex>
+        </Box>
+    );
+};
+
+const MessageComposer = () => {
+    const { matrixClient, selectedRoom } = useMatrixContext();
+
+    if (!matrixClient || !selectedRoom) {
+        return null;
+    }
+
+    const textInputRef: React.Ref<HTMLInputElement> | undefined =
+        React.useRef<any>();
+
+    const onButtonSendClicked: MouseEventHandler<HTMLButtonElement> = async (
+        e
+    ) => {
+        console.log('---> send button clicked');
+
+        const message = textInputRef.current?.value;
+        console.log({ message });
+
+        if (!message) return;
+
+        const [sendMessageRes, sendMessageErr] = await resolvePromise(
+            matrixClient.sendTextMessage(selectedRoom.roomId, message)
+        );
+
+        console.log({ sendMessageRes, sendMessageErr });
+    };
+
+    return (
+        <Flex gap={10}>
+            <TextInput ref={textInputRef} style={{ flex: 1 }} />
+            <Button onClick={onButtonSendClicked}>Send</Button>
         </Flex>
     );
 };
