@@ -1,9 +1,10 @@
+import React from 'react';
 import { Flex, TextInput, Button, Text } from '@mantine/core';
-import { useMessageComposer } from './use-message-composer';
+import { useChatBoxContext } from './chat-box-context';
 
 export const MessageComposer = () => {
-    const { textMessage, setTextMessage, handleSendTextMessage } =
-        useMessageComposer();
+    const [textMessage, setTextMessage] = React.useState('');
+    const { handleSendTextMessage } = useChatBoxContext();
 
     return (
         <Flex w={'100%'} gap={4}>
@@ -13,11 +14,17 @@ export const MessageComposer = () => {
                 onChange={(e) => setTextMessage(e.target.value)}
                 onKeyUp={(e) => {
                     if (e.code.toLowerCase() === 'enter') {
-                        handleSendTextMessage();
+                        handleSendTextMessage(textMessage);
+                        setTextMessage('');
                     }
                 }}
             />
-            <Button onClick={handleSendTextMessage}>
+            <Button
+                onClick={() => {
+                    handleSendTextMessage(textMessage);
+                    setTextMessage('');
+                }}
+            >
                 <Text>Send</Text>
             </Button>
         </Flex>

@@ -1,16 +1,23 @@
-import { Box, Stack, Text } from '@mantine/core';
-import { useChatBox } from './use-chat-box';
+import { Box, Button, Stack, Text } from '@mantine/core';
 import { getUserId } from '../../../utils';
 import dayjs from 'dayjs';
-import { MessageComposer } from './message-composer/message-composer';
+import { MessageComposer } from './message-composer';
 import React from 'react';
+import { useChatBoxContext } from './chat-box-context';
 
 export const ChatBox = () => {
     const boxRef: React.RefObject<HTMLDivElement> = React.useRef<any>(null);
-    const { clientUserId, room, events, handleResendEvent } = useChatBox();
+    const {
+        clientUserId,
+        room,
+        events,
+        shouldShowLatestEvent,
+        handleResendEvent,
+        handleLoadPreviousEvents,
+    } = useChatBoxContext();
 
     React.useEffect(() => {
-        if (!boxRef.current) return;
+        if (!boxRef.current || !shouldShowLatestEvent) return;
 
         boxRef.current?.scrollTo({
             behavior: 'smooth',
@@ -36,6 +43,10 @@ export const ChatBox = () => {
                 }}
             >
                 <Stack>
+                    <Button onClick={handleLoadPreviousEvents}>
+                        Load Previous
+                    </Button>
+
                     {events?.map((e, i) => {
                         const isSelf = e.sender?.userId === clientUserId;
 

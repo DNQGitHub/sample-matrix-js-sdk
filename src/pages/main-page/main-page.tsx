@@ -2,6 +2,7 @@ import { Box, Container, Flex, Stack, Title } from '@mantine/core';
 import { ActionBar } from './action-bar/action-bar';
 import { RoomList } from './room-list/room-list';
 import { ChatBox } from './chat-box/chat-box';
+import { ChatBoxProvider } from './chat-box/chat-box-context';
 
 export const MainPage = () => {
     return (
@@ -18,7 +19,9 @@ export const MainPage = () => {
                         </Box>
 
                         <Box style={{ flex: 3 }}>
-                            <ChatBox />
+                            <ChatBoxProvider>
+                                <ChatBox />
+                            </ChatBoxProvider>
                         </Box>
                     </Flex>
                 </Stack>
