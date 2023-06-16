@@ -23,8 +23,8 @@ export const SoloRoomList = () => {
                         p={12}
                         style={{
                             borderRadius: 8,
-                            border: isSelectedRoom
-                                ? '1px solid black'
+                            backgroundColor: isSelectedRoom
+                                ? '#dedede'
                                 : undefined,
                         }}
                         onClick={() => setSelectedRoom(r)}
@@ -39,7 +39,14 @@ export const SoloRoomList = () => {
                             ).fromNow()}
                         </Text>
 
-                        <Text>
+                        <Text
+                            style={{
+                                wordBreak: 'break-all',
+                                wordWrap: 'break-word',
+                                // @ts-ignore
+                                textWrap: 'wrap',
+                            }}
+                        >
                             {JSON.stringify(latestEvent?.event.content)}
                         </Text>
                     </UnstyledButton>

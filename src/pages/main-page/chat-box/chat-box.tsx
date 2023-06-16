@@ -27,8 +27,8 @@ export const ChatBox = () => {
             <Box
                 ref={boxRef}
                 p={10}
-                h={400}
-                mah={400}
+                h={500}
+                mah={500}
                 style={{
                     border: '1px solid black',
                     borderRadius: 8,
@@ -48,7 +48,7 @@ export const ChatBox = () => {
                                 px={12}
                                 py={4}
                                 style={{
-                                    maxWidth: '70%',
+                                    maxWidth: '75%',
                                     marginLeft: isSelf ? 'auto' : undefined,
                                     marginRight: !isSelf ? 'auto' : undefined,
                                     border: `2px solid ${
@@ -57,12 +57,7 @@ export const ChatBox = () => {
                                     borderRadius: 4,
                                 }}
                             >
-                                <Text
-                                    fw={500}
-                                    size={20}
-                                    underline
-                                    ta={isSelf ? 'right' : 'left'}
-                                >
+                                <Text fw={500} size={20} underline>
                                     {getUserId(e.sender?.userId)}
                                     {' | '}
                                     {dayjs(e.event.origin_server_ts).format(
@@ -71,10 +66,22 @@ export const ChatBox = () => {
                                 </Text>
 
                                 <Text
-                                    ta={isSelf ? 'right' : 'left'}
-                                    style={{ wordBreak: 'break-all' }}
+                                    component="pre"
+                                    style={{
+                                        wordBreak: 'break-all',
+                                        wordWrap: 'break-word',
+                                        // @ts-ignore
+                                        textWrap: 'wrap',
+                                    }}
                                 >
-                                    {JSON.stringify(e.event.content)}
+                                    {JSON.stringify(
+                                        {
+                                            type: e.getType(),
+                                            content: e.getContent(),
+                                        },
+                                        null,
+                                        4
+                                    )}
                                 </Text>
 
                                 {e.status && (
