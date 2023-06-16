@@ -1,6 +1,6 @@
 import React from 'react';
 import dayjs from 'dayjs';
-import { UnstyledButton, Stack, Text, Flex } from '@mantine/core';
+import { UnstyledButton, Stack, Text } from '@mantine/core';
 import { useMatrixContext } from '../../../contexts';
 import { getUserId } from '../../../utils';
 
@@ -14,8 +14,7 @@ export const GroupRoomList = () => {
     return (
         <Stack>
             {filterRooms.map((r) => {
-                const events = r.getLiveTimeline().getEvents();
-                const lastEvent = events[events.length - 1];
+                const latestEvent = r.getLastLiveEvent();
                 const isSelectedRoom = r.roomId === selectedRoom?.roomId;
 
                 return (
@@ -32,12 +31,16 @@ export const GroupRoomList = () => {
                         <Text fw={700}>[ {r.name} ]</Text>
 
                         <Text underline>
-                            {getUserId(lastEvent.sender?.userId)}
+                            {getUserId(latestEvent?.sender?.userId)}
                             {' | '}
-                            {dayjs(lastEvent.event.origin_server_ts).fromNow()}
+                            {dayjs(
+                                latestEvent?.event.origin_server_ts
+                            ).fromNow()}
                         </Text>
 
-                        <Text>{JSON.stringify(lastEvent.event.content)}</Text>
+                        <Text>
+                            {JSON.stringify(latestEvent?.event.content)}
+                        </Text>
                     </UnstyledButton>
                 );
             })}
