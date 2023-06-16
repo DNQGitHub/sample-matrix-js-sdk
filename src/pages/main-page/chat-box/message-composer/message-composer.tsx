@@ -11,6 +11,11 @@ export const MessageComposer = () => {
                 style={{ flex: 1 }}
                 value={textMessage}
                 onChange={(e) => setTextMessage(e.target.value)}
+                onKeyUp={(e) => {
+                    if (e.code.toLowerCase() === 'enter') {
+                        handleSendTextMessage();
+                    }
+                }}
             />
             <Button onClick={handleSendTextMessage}>
                 <Text>Send</Text>

@@ -7,11 +7,11 @@ import React from 'react';
 
 export const ChatBox = () => {
     const boxRef: React.RefObject<HTMLDivElement> = React.useRef<any>(null);
-    const { clientUserId, room, events } = useChatBox();
+    const { clientUserId, room, events, handleResendEvent } = useChatBox();
 
     React.useEffect(() => {
         if (!boxRef.current) return;
-        console.log({ test: boxRef.current.scrollHeight });
+
         boxRef.current?.scrollTo({
             behavior: 'smooth',
             top: boxRef.current.scrollHeight,
@@ -41,6 +41,9 @@ export const ChatBox = () => {
 
                         return (
                             <Box
+                                onClick={() => {
+                                    handleResendEvent(e);
+                                }}
                                 key={e.getId() || i}
                                 px={12}
                                 py={4}
