@@ -6,6 +6,7 @@ import MatrixSdk, {
     ICreateClientOpts,
     RoomEvent,
     MatrixEvent,
+    PendingEventOrdering,
 } from 'matrix-js-sdk';
 import { ISyncStateData, SyncState } from 'matrix-js-sdk/lib/sync';
 
@@ -48,14 +49,10 @@ export const MatrixProvider = ({ children }: MatrixProviderProps) => {
             }
         );
 
-        matrixClient.on(ClientEvent.Room, (room: Room) => {
-            console.log('room-event', { room });
-        });
-
         matrixClient.on(
             RoomEvent.Timeline,
             (event: MatrixEvent, room?: Room, toStartOfTimeline?: boolean) => {
-                console.log('room-timeline-event', {
+                console.log('room-timeline-event --->', {
                     event,
                     room,
                     toStartOfTimeline,
@@ -66,7 +63,24 @@ export const MatrixProvider = ({ children }: MatrixProviderProps) => {
             }
         );
 
-        matrixClient.startClient();
+        matrixClient.on(
+            RoomEvent.LocalEchoUpdated,
+            (event, room, oldEventId, oldStatus) => {
+                console.log('local-echo-updated-event --->', {
+                    event,
+                    room,
+                    oldEventId,
+                    oldStatus,
+                });
+
+                const rooms = matrixClient.getRooms();
+                setRooms(rooms);
+            }
+        );
+
+        matrixClient.startClient({
+            pendingEventOrdering: PendingEventOrdering.Detached,
+        });
     };
 
     const stopMatrixClient = () => {

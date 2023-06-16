@@ -3,9 +3,20 @@ import { useChatBox } from './use-chat-box';
 import { getUserId } from '../../../utils';
 import dayjs from 'dayjs';
 import { MessageComposer } from './message-composer/message-composer';
+import React from 'react';
 
 export const ChatBox = () => {
-    const { clientUserId, room, timelineEvents } = useChatBox();
+    const boxRef: React.RefObject<HTMLDivElement> = React.useRef<any>(null);
+    const { clientUserId, room, events } = useChatBox();
+
+    React.useEffect(() => {
+        if (!boxRef.current) return;
+        console.log({ test: boxRef.current.scrollHeight });
+        boxRef.current?.scrollTo({
+            behavior: 'smooth',
+            top: boxRef.current.scrollHeight,
+        });
+    }, [events]);
 
     return (
         <Stack p={10} style={{ border: '1px solid black', borderRadius: 8 }}>
@@ -14,6 +25,7 @@ export const ChatBox = () => {
             </Text>
 
             <Box
+                ref={boxRef}
                 p={10}
                 h={400}
                 mah={400}
@@ -24,11 +36,12 @@ export const ChatBox = () => {
                 }}
             >
                 <Stack>
-                    {timelineEvents?.map((e) => {
+                    {events?.map((e, i) => {
                         const isSelf = e.sender?.userId === clientUserId;
 
                         return (
                             <Box
+                                key={e.getId() || i}
                                 px={12}
                                 py={4}
                                 style={{
@@ -60,6 +73,12 @@ export const ChatBox = () => {
                                 >
                                     {JSON.stringify(e.event.content)}
                                 </Text>
+
+                                {e.status && (
+                                    <Text color="gray" size={14} ta="right">
+                                        {e.status}...
+                                    </Text>
+                                )}
                             </Box>
                         );
                     })}
