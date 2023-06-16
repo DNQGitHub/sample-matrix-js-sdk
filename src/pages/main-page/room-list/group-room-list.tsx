@@ -19,6 +19,7 @@ export const GroupRoomList = () => {
 
                 return (
                     <UnstyledButton
+                        key={r.roomId}
                         p={12}
                         style={{
                             borderRadius: 8,
