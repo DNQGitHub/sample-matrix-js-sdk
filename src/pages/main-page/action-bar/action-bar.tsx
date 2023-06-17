@@ -1,6 +1,6 @@
 import { Button, Flex } from '@mantine/core';
 import { useActionBar } from './use-action-bar';
-import { useAuthStore } from '../../../stores/auth-store';
+import { useAuthStore } from '../../../services/auth-service/auth-store';
 
 export const ActionBar = () => {
     const {

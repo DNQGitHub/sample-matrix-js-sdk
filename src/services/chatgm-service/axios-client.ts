@@ -5,13 +5,10 @@ export const axiosClient = Axios.create({
 });
 
 export const injectAccessToken = (accessToken: string) => {
-    axiosClient.interceptors.request.use(
-        (config) => {
-            config.headers.Authorization = 'Bearer ' + accessToken;
-            return config;
-        },
-        (error) => {
-            return Promise.reject(error);
-        }
-    );
+    axiosClient.defaults.headers.common['Authorization'] =
+        'Bearer ' + accessToken;
+};
+
+export const ejectAccessToken = () => {
+    axiosClient.defaults.headers.common['Authorization'] = undefined;
 };

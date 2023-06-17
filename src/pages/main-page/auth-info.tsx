@@ -1,5 +1,5 @@
 import { Box, Text } from '@mantine/core';
-import { useAuthStore } from '../../stores';
+import { useAuthStore } from '../../services/auth-service/auth-store';
 
 export const AuthInfo = () => {
     const auth = useAuthStore();
