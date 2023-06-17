@@ -6,13 +6,27 @@ import { transformToChatGmUserId } from '~/services/matrix-service/utils';
 import dayjs from 'dayjs';
 import { EReaction } from '~/services/matrix-service/dtos';
 
-export type MessageWrapperProps = PropsWithChildren<{
+export type MessageProps = {
     event: MatrixEvent;
-}>;
+    index: number;
+    events: MatrixEvent[];
+};
 
-export const MessageWrapper = ({ children, event }: MessageWrapperProps) => {
-    const { isSelf, reactions, handleResendEvent, handleReactEvent } =
-        useMessageWrapper(event);
+export type MessageWrapperProps = PropsWithChildren<MessageProps>;
+
+export const MessageWrapper = ({
+    children,
+    event,
+    index,
+    events,
+}: MessageWrapperProps) => {
+    const {
+        isSelf,
+        readUserIds,
+        reactions,
+        handleResendEvent,
+        handleReactEvent,
+    } = useMessageWrapper(event, index, events);
 
     return (
         <Stack>
@@ -39,6 +53,13 @@ export const MessageWrapper = ({ children, event }: MessageWrapperProps) => {
                         {event.status}...
                     </Text>
                 )}
+
+                <Box>
+                    <Text underline>Read by:</Text>
+                    {readUserIds.map((userId, i) => (
+                        <Text key={i}>* {userId}</Text>
+                    ))}
+                </Box>
 
                 <Flex gap={5} justify="flex-end">
                     {reactions.map((r) => (

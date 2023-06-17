@@ -62,8 +62,9 @@ export const MatrixProvider = ({ children }: MatrixProviderProps) => {
                 console.log('sync-event', { state, lastState, data });
 
                 if (state !== SyncState.Prepared) return;
-                console.log({ aaaa: matrixClient.getRooms() });
-                setRooms(matrixClient.getRooms());
+
+                const rooms = matrixClient.getRooms();
+                setRooms(rooms);
             }
         );
 
@@ -95,6 +96,16 @@ export const MatrixProvider = ({ children }: MatrixProviderProps) => {
                 setRooms(rooms);
             }
         );
+
+        matrixClient.on(RoomEvent.Receipt, (event, room) => {
+            console.log('room-receipt-event --->', {
+                event,
+                room,
+            });
+
+            const rooms = matrixClient.getRooms();
+            setRooms(rooms);
+        });
 
         matrixClient.startClient({
             pendingEventOrdering: PendingEventOrdering.Detached,

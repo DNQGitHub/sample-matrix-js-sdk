@@ -1,14 +1,14 @@
-import { MatrixEvent } from 'matrix-js-sdk';
-import { MessageWrapper } from '../message-wrapper/message-wrapper';
+import {
+    MessageProps,
+    MessageWrapper,
+} from '../message-wrapper/message-wrapper';
 import { Text } from '@mantine/core';
 
-export type EventMessageProps = {
-    event: MatrixEvent;
-};
+export type EventMessageProps = MessageProps;
 
-export const EventMessage = ({ event }: EventMessageProps) => {
+export const EventMessage = ({ event, index, events }: EventMessageProps) => {
     return (
-        <MessageWrapper event={event}>
+        <MessageWrapper event={event} index={index} events={events}>
             <Text
                 component="pre"
                 style={{
