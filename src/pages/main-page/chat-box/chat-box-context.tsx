@@ -1,5 +1,5 @@
 import React, { PropsWithChildren } from 'react';
-import { MatrixEvent, Room } from 'matrix-js-sdk';
+import { EventStatus, EventType, MatrixEvent, Room } from 'matrix-js-sdk';
 import { useMatrixContext } from '~/services/matrix-service/matrix-context';
 
 // -------------------------------------------
@@ -10,8 +10,13 @@ export type ChatBoxContextValue = {
 
     shouldShowLatestEvent: boolean;
 
-    handleSendTextMessage: (textMessage: string) => void;
-    handleLoadPreviousEvents: () => void;
+    handleSendTextMessage: (textMessage: string) => Promise<void>;
+    handleLoadPreviousEvents: () => Promise<void>;
+    handleResendEvent: (event: MatrixEvent) => Promise<void>;
+    handleReactEvent: (
+        event: MatrixEvent,
+        reaction: 'like' | 'haha' | 'angry'
+    ) => Promise<void>;
 };
 
 export const ChatBoxContext = React.createContext<ChatBoxContextValue>(
@@ -46,14 +51,38 @@ export const ChatBoxProvider = ({ children }: ChatBoxProviderProps) => {
         if (!selectedRoom || !textMessage?.trim()) return;
 
         shouldShowLatestEventRef.current = true;
-        matrixClient.sendTextMessage(selectedRoom.roomId, textMessage);
+        await matrixClient.sendTextMessage(selectedRoom.roomId, textMessage);
     };
 
-    const handleLoadPreviousEvents = () => {
+    const handleLoadPreviousEvents = async () => {
         if (!selectedRoom) return;
 
         shouldShowLatestEventRef.current = false;
-        matrixClient.scrollback(selectedRoom);
+        await matrixClient.scrollback(selectedRoom);
+    };
+
+    const handleResendEvent = async (event: MatrixEvent) => {
+        if (!selectedRoom) return;
+        if (event.status !== EventStatus.NOT_SENT) return;
+
+        shouldShowLatestEventRef.current = false;
+        await matrixClient.resendEvent(event, selectedRoom);
+    };
+
+    const handleReactEvent = async (
+        event: MatrixEvent,
+        reaction: 'like' | 'haha' | 'angry'
+    ) => {
+        if (!selectedRoom) return;
+
+        shouldShowLatestEventRef.current = false;
+        await matrixClient.sendEvent(selectedRoom.roomId, EventType.Reaction, {
+            'm.relates_to': {
+                event_id: event.getId(),
+                key: reaction,
+                rel_type: 'm.annotation',
+            },
+        });
     };
 
     return (
@@ -66,6 +95,8 @@ export const ChatBoxProvider = ({ children }: ChatBoxProviderProps) => {
 
                 handleSendTextMessage,
                 handleLoadPreviousEvents,
+                handleResendEvent,
+                handleReactEvent,
             }}
         >
             {children}
