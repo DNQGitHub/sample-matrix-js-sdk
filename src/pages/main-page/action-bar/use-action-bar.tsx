@@ -49,7 +49,9 @@ export const useActionBar = () => {
                 await resolvePromise(matrixClient.getRoomIdForAlias(roomAlias));
 
             if (!getRoomIdForAliasErr && getRoomIdForAliasRes) {
-                const room = getRoomById(getRoomIdForAliasRes.room_id);
+                const room = await matrixClient.getRoomUntilTimeout(
+                    getRoomIdForAliasRes.room_id
+                );
                 if (room) setSelectedRoom(room);
                 return;
             }
@@ -69,7 +71,9 @@ export const useActionBar = () => {
                 throw new Error('Fail to create room');
             }
 
-            const room = getRoomById(createRoomRes.room_id);
+            const room = await matrixClient.getRoomUntilTimeout(
+                createRoomRes.room_id
+            );
             if (room) setSelectedRoom(room);
         } catch (error: any) {
             console.log('create solo room', { error });
@@ -96,7 +100,9 @@ export const useActionBar = () => {
                 await resolvePromise(matrixClient.getRoomIdForAlias(roomAlias));
 
             if (!getRoomIdForAliasErr && getRoomIdForAliasRes) {
-                const room = getRoomById(getRoomIdForAliasRes.room_id);
+                const room = await matrixClient.getRoomUntilTimeout(
+                    getRoomIdForAliasRes.room_id
+                );
                 if (room) setSelectedRoom(room);
                 return;
             }
@@ -115,32 +121,14 @@ export const useActionBar = () => {
                 throw new Error('Fail to create room');
             }
 
-            const room = getRoomById(createRoomRes.room_id, 60000);
+            const room = await matrixClient.getRoomUntilTimeout(
+                createRoomRes.room_id,
+                60000
+            );
             if (room) setSelectedRoom(room);
         } catch (error: any) {
             console.log('create group room', { error });
         }
-    };
-
-    const getRoomById = (roomId: string, timeout: number = 30000) => {
-        if (!matrixClient) throw new Error('MatrixClient is undefined');
-
-        let room = null;
-        let startTime = Date.now();
-
-        do {
-            room = matrixClient.getRoom(roomId);
-
-            if (room) {
-                break;
-            }
-
-            if (Date.now() - startTime > timeout) {
-                throw new Error('Get room timeout');
-            }
-        } while (!room);
-
-        return room;
     };
 
     return {

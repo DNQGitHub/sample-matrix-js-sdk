@@ -5,11 +5,10 @@ import {
     MatrixScheduler,
     MemoryCryptoStore,
     MemoryStore,
+    Room,
 } from 'matrix-js-sdk';
 import { LoginWithAccessTokenResponse } from './dtos';
 import { CryptoStore } from 'matrix-js-sdk/lib/crypto/store/base';
-
-const BASE_URL = 'https://matrix.tauhu.cloud';
 
 function cryptoStoreFactory(): CryptoStore {
     return new MemoryCryptoStore();
@@ -29,18 +28,11 @@ function amendClientOpts(opts: ICreateClientOpts): ICreateClientOpts {
 }
 
 export class MatrixService extends MatrixClient {
-    private constructor(opts: Omit<IMatrixClientCreateOpts, 'baseUrl'>) {
-        super(
-            amendClientOpts({
-                baseUrl: BASE_URL,
-                ...opts,
-            })
-        );
+    private constructor(opts: IMatrixClientCreateOpts) {
+        super(amendClientOpts(opts));
     }
 
-    static createClient(
-        opts: Omit<IMatrixClientCreateOpts, 'baseUrl'>
-    ): MatrixService {
+    static createClient(opts: IMatrixClientCreateOpts): MatrixService {
         return new MatrixService(opts);
     }
 
@@ -55,5 +47,27 @@ export class MatrixService extends MatrixClient {
             userId: response.user_id,
             accessToken: response.access_token,
         };
+    }
+
+    async getRoomUntilTimeout(
+        roomId?: string,
+        timeout: number = 30000
+    ): Promise<Room | null> {
+        return new Promise((resolve, reject) => {
+            if (!roomId) return resolve(null);
+
+            let room: Room | null = null;
+            const startTime = Date.now();
+
+            do {
+                if (Date.now() - startTime > timeout) {
+                    return reject(`Timeout, cannot get room with id ${roomId}`);
+                }
+
+                room = this.getRoom(roomId);
+            } while (room === null);
+
+            return resolve(room);
+        });
     }
 }

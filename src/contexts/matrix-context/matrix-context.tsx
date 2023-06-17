@@ -8,6 +8,7 @@ import {
 } from 'matrix-js-sdk';
 import { ISyncStateData, SyncState } from 'matrix-js-sdk/lib/sync';
 import { MatrixService } from '../../services';
+import { useAuthStore } from '../../stores';
 
 // -------------------------------------------------
 
@@ -36,7 +37,13 @@ export const useMatrixContext = () => {
 
 export type MatrixProviderProps = PropsWithChildren<{}>;
 
-const matrixClient = MatrixService.createClient({});
+const BASE_URL = 'https://matrix.tauhu.cloud';
+
+const matrixClient = MatrixService.createClient({
+    baseUrl: BASE_URL,
+    userId: useAuthStore.getState().authMatrixUser?.userId,
+    accessToken: useAuthStore.getState().authMatrixUser?.accessToken,
+});
 
 export const MatrixProvider = ({ children }: MatrixProviderProps) => {
     const [rooms, setRooms] = React.useState<Array<Room>>([]);
