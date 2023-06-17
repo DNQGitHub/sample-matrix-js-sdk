@@ -4,11 +4,12 @@ import { useChatBoxContext } from './chat-box-context';
 
 export const MessageComposer = () => {
     const [textMessage, setTextMessage] = React.useState('');
-    const { handleSendTextMessage } = useChatBoxContext();
+    const { room, handleSendTextMessage } = useChatBoxContext();
 
     return (
         <Flex w={'100%'} gap={4}>
             <TextInput
+                disabled={!room}
                 style={{ flex: 1 }}
                 value={textMessage}
                 onChange={(e) => setTextMessage(e.target.value)}
@@ -20,6 +21,7 @@ export const MessageComposer = () => {
                 }}
             />
             <Button
+                disabled={!room}
                 onClick={() => {
                     handleSendTextMessage(textMessage);
                     setTextMessage('');

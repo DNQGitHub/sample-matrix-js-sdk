@@ -43,9 +43,11 @@ export const ChatBox = () => {
                 }}
             >
                 <Stack>
-                    <Button onClick={handleLoadPreviousEvents}>
-                        Load Previous
-                    </Button>
+                    {room && (
+                        <Button onClick={handleLoadPreviousEvents}>
+                            Load Previous
+                        </Button>
+                    )}
 
                     {events?.map((e, i) => {
                         const isSelf = e.sender?.userId === clientUserId;
