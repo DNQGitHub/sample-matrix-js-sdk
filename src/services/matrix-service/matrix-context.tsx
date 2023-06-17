@@ -7,8 +7,8 @@ import {
     PendingEventOrdering,
 } from 'matrix-js-sdk';
 import { ISyncStateData, SyncState } from 'matrix-js-sdk/lib/sync';
-import { MatrixService } from '../../services';
-import { useAuthStore } from '../../services/auth-service/auth-store';
+import { MatrixService } from '~/services';
+import { useAuthStore } from '~/services/auth-service/auth-store';
 
 // -------------------------------------------------
 

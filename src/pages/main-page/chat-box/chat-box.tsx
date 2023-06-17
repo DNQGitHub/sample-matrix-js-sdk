@@ -3,7 +3,7 @@ import dayjs from 'dayjs';
 import { MessageComposer } from './message-composer';
 import React from 'react';
 import { useChatBoxContext } from './chat-box-context';
-import { transformToChatGmUserId } from '../../../services/matrix-service/utils';
+import { transformToChatGmUserId } from '~/services/matrix-service/utils';
 
 export const ChatBox = () => {
     const boxRef: React.RefObject<HTMLDivElement> = React.useRef<any>(null);

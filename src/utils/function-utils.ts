@@ -43,7 +43,7 @@ export async function resolvePromise<T>(
 }
 
 export async function wait(miliseconds: number) {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
         setTimeout(() => {
             resolve(null);
         }, miliseconds);

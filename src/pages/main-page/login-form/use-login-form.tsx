@@ -1,6 +1,6 @@
-import { AuthService, ChatGmService } from '../../../services';
-import { LoginWithHandleRequest } from '../../../services/chatgm-service/dtos';
-import { useMatrixContext } from '../../../services/matrix-service/matrix-context';
+import { AuthService, ChatGmService } from '~/services';
+import { LoginWithHandleRequest } from '~/services/chatgm-service/dtos';
+import { useMatrixContext } from '~/services/matrix-service/matrix-context';
 
 export const useLoginForm = () => {
     const { matrixClient, stopMatrixClient } = useMatrixContext();

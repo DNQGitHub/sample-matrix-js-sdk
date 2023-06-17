@@ -1,12 +1,12 @@
-import { MatrixService } from '../matrix-service/matrix-service';
-import { ChatGmService } from '../chatgm-service/chatgm-service';
-import { LoginWithHandleRequest } from '../chatgm-service/dtos';
-import { resolvePromise } from '../../utils';
+import { MatrixService } from '~/services/matrix-service/matrix-service';
+import { ChatGmService } from '~/services/chatgm-service/chatgm-service';
+import { LoginWithHandleRequest } from '~/services/chatgm-service/dtos';
+import { resolvePromise } from '~/utils';
 import { useAuthStore } from './auth-store';
 import {
     ejectAccessToken,
     injectAccessToken,
-} from '../chatgm-service/axios-client';
+} from '~/services/chatgm-service/axios-client';
 
 export class AuthService {
     async loginWithChatGmHandle(

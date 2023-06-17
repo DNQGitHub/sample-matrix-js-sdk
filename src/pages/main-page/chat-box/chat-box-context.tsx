@@ -1,6 +1,6 @@
 import React, { PropsWithChildren } from 'react';
 import { EventStatus, MatrixEvent, Room } from 'matrix-js-sdk';
-import { useMatrixContext } from '../../../services/matrix-service/matrix-context';
+import { useMatrixContext } from '~/services/matrix-service/matrix-context';
 
 // -------------------------------------------
 

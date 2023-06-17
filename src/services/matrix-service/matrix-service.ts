@@ -16,7 +16,7 @@ import {
     makeRoomAlias,
     makeRoomName,
 } from './utils';
-import { resolvePromise } from '../../utils';
+import { resolvePromise } from '~/utils';
 
 function cryptoStoreFactory(): CryptoStore {
     return new MemoryCryptoStore();

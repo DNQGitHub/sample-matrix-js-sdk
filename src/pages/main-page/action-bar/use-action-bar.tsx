@@ -1,5 +1,5 @@
-import { useAuthStore } from '../../../services/auth-service/auth-store';
-import { useMatrixContext } from '../../../services/matrix-service/matrix-context';
+import { useAuthStore } from '~/services/auth-service/auth-store';
+import { useMatrixContext } from '~/services/matrix-service/matrix-context';
 
 export const useActionBar = () => {
     const {

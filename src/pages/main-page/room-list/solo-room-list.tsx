@@ -1,8 +1,8 @@
 import React from 'react';
 import dayjs from 'dayjs';
 import { UnstyledButton, Stack, Text } from '@mantine/core';
-import { transformToChatGmUserId } from '../../../services/matrix-service/utils';
-import { useMatrixContext } from '../../../services/matrix-service/matrix-context';
+import { transformToChatGmUserId } from '~/services/matrix-service/utils';
+import { useMatrixContext } from '~/services/matrix-service/matrix-context';
 
 export const SoloRoomList = () => {
     const { rooms, selectedRoom, setSelectedRoom } = useMatrixContext();

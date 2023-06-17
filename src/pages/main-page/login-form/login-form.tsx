@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button, Flex, TextInput } from '@mantine/core';
 import { useLoginForm } from './use-login-form';
-import { useAuthStore } from '../../../services/auth-service/auth-store';
+import { useAuthStore } from '~/services/auth-service/auth-store';
 
 export const LoginForm = () => {
     const [handle, setHandle] = React.useState('gm.qtest1');
