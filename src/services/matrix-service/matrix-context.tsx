@@ -16,8 +16,8 @@ export type MatrixContextValue = {
     matrixClient: MatrixService;
     rooms: Array<Room>;
     selectedRoom?: Room;
-    startMatrixClient: () => void;
-    stopMatrixClient: () => void;
+    startMatrixClient: () => Promise<void>;
+    stopMatrixClient: () => Promise<void>;
     setSelectedRoom: (room: Room) => void;
 };
 
@@ -106,6 +106,7 @@ export const MatrixProvider = ({ children }: MatrixProviderProps) => {
 
         matrixClient.removeAllListeners();
         matrixClient.stopClient();
+        await matrixClient.clearStores();
         setSelectedRoom(undefined);
         setRooms([]);
     };

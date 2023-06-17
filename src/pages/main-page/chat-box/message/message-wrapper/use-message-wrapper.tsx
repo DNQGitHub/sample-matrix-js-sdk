@@ -1,14 +1,14 @@
-import { EventType, MatrixEvent } from 'matrix-js-sdk';
+import { MatrixEvent } from 'matrix-js-sdk';
 import { useMatrixContext } from '~/services/matrix-service/matrix-context';
 import { useChatBoxContext } from '../../chat-box-context';
 import React from 'react';
-import { Reactions } from '~/services/matrix-service/dtos';
+import { EReaction } from '~/services/matrix-service/dtos';
 
 export const useMessageWrapper = (event: MatrixEvent) => {
     const [reactions, setReactions] = React.useState<Array<MatrixEvent>>([]);
 
     const { matrixClient } = useMatrixContext();
-    const { room, handleResendEvent, handleReactEvent } = useChatBoxContext();
+    const { room, ...chatBox } = useChatBoxContext();
 
     const isSelf = matrixClient.getUserId() === event.getSender();
 
@@ -19,13 +19,21 @@ export const useMessageWrapper = (event: MatrixEvent) => {
 
         if (!eventId) return;
 
-        const response = await matrixClient.relations(
-            room.roomId,
-            eventId,
-            'm.annotation',
-            EventType.Reaction
-        );
-        setReactions(response.events);
+        const events = await matrixClient.fetchReactions(room.roomId, eventId);
+        setReactions(events);
+    };
+
+    const handleResendEvent = async () => {
+        await chatBox.handleResendEvent(event);
+    };
+
+    const handleReactEvent = async (reaction: EReaction) => {
+        const eventId = event.getId();
+
+        if (!eventId) return;
+
+        await chatBox.handleReactEvent(eventId, reaction);
+        fetchReactions();
     };
 
     React.useEffect(() => {
@@ -35,11 +43,7 @@ export const useMessageWrapper = (event: MatrixEvent) => {
     return {
         isSelf,
         reactions,
-        handleResendEvent: () => {
-            handleResendEvent(event);
-        },
-        handleReactEvent: (reaction: Reactions) => {
-            handleReactEvent(event, reaction).then(() => fetchReactions());
-        },
+        handleResendEvent,
+        handleReactEvent,
     };
 };

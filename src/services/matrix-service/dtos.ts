@@ -3,7 +3,7 @@ export type LoginWithAccessTokenResponse = {
     accessToken: string;
 };
 
-export enum Reactions {
+export enum EReaction {
     LIKE = 'like',
     SMILE = 'smile',
     ANGRY = 'angry',

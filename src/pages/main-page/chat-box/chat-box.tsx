@@ -43,7 +43,7 @@ export const ChatBox = () => {
                     )}
 
                     {events?.map((e) => {
-                        return <EventMessage event={e} />;
+                        return <EventMessage key={e.getId()} event={e} />;
                     })}
                 </Stack>
             </Box>

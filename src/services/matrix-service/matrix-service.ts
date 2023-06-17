@@ -3,14 +3,13 @@ import {
     ICreateClientOpts,
     IMatrixClientCreateOpts,
     MatrixClient,
-    MatrixEvent,
     MatrixScheduler,
     MemoryCryptoStore,
     MemoryStore,
     Preset,
     Room,
 } from 'matrix-js-sdk';
-import { LoginWithAccessTokenResponse, Reactions } from './dtos';
+import { LoginWithAccessTokenResponse, EReaction } from './dtos';
 import { CryptoStore } from 'matrix-js-sdk/lib/crypto/store/base';
 import {
     transformToChatGmUserId,
@@ -125,13 +124,28 @@ export class MatrixService extends MatrixClient {
         return room;
     }
 
-    async sendReaction(room: Room, event: MatrixEvent, reaction: Reactions) {
-        return await this.sendEvent(room.roomId, EventType.Reaction, {
+    async sendReaction(roomId: string, eventId: string, reaction: EReaction) {
+        return await this.sendEvent(roomId, EventType.Reaction, {
             'm.relates_to': {
-                event_id: event.getId(),
+                event_id: eventId,
                 key: reaction,
                 rel_type: 'm.annotation',
             },
         });
+    }
+
+    async fetchReactions(roomId: string, eventId: string) {
+        const response = await this.relations(
+            roomId,
+            eventId,
+            'm.annotation',
+            EventType.Reaction
+        );
+
+        return response.events;
+    }
+
+    async test() {
+        // this.
     }
 }
