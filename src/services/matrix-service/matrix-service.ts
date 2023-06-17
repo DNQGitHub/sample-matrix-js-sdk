@@ -5,10 +5,18 @@ import {
     MatrixScheduler,
     MemoryCryptoStore,
     MemoryStore,
+    Preset,
     Room,
 } from 'matrix-js-sdk';
 import { LoginWithAccessTokenResponse } from './dtos';
 import { CryptoStore } from 'matrix-js-sdk/lib/crypto/store/base';
+import {
+    transformToChatGmUserId,
+    transformToMatrixUserId,
+    makeRoomAlias,
+    makeRoomName,
+} from './utils';
+import { resolvePromise } from '../../utils';
 
 function cryptoStoreFactory(): CryptoStore {
     return new MemoryCryptoStore();
@@ -69,5 +77,49 @@ export class MatrixService extends MatrixClient {
 
             return resolve(room);
         });
+    }
+
+    async createChatGmRoom(targetChatGmUserIds: Array<string>) {
+        const matrixMeUserId = this.getUserId();
+        if (!matrixMeUserId) return;
+
+        const chatGmMeUserId = transformToChatGmUserId(matrixMeUserId);
+        if (!chatGmMeUserId) return;
+
+        const chatGmUserIds = [chatGmMeUserId, ...targetChatGmUserIds];
+        const roomName = makeRoomName(chatGmUserIds);
+        const roomAlias = makeRoomAlias(roomName);
+
+        const [getRoomIdForAliasRes, getRoomIdForAliasErr] =
+            await resolvePromise(this.getRoomIdForAlias(roomAlias));
+
+        if (!getRoomIdForAliasErr && getRoomIdForAliasRes) {
+            const room = await this.getRoomUntilTimeout(
+                getRoomIdForAliasRes.room_id
+            );
+
+            return room;
+        }
+
+        const [createRoomRes, createRoomErr] = await resolvePromise(
+            this.createRoom({
+                is_direct: true,
+                preset: Preset.TrustedPrivateChat,
+                name: roomName,
+                room_alias_name: roomName,
+                invite: targetChatGmUserIds.map(transformToMatrixUserId),
+            })
+        );
+
+        if (createRoomErr || !createRoomRes) {
+            throw new Error('Fail to create room');
+        }
+
+        const room = await this.getRoomUntilTimeout(
+            createRoomRes.room_id,
+            60000
+        );
+
+        return room;
     }
 }
