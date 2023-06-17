@@ -39,7 +39,7 @@ export const MessageWrapper = ({ children, event }: MessageWrapperProps) => {
                     </Text>
                 )}
 
-                <Flex gap={5}>
+                <Flex gap={5} justify="flex-end">
                     {reactions.map((r) => (
                         <Text
                             key={r.getId()}
