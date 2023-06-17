@@ -2,7 +2,7 @@ import React from 'react';
 import dayjs from 'dayjs';
 import { UnstyledButton, Stack, Text } from '@mantine/core';
 import { useMatrixContext } from '../../../contexts';
-import { getUserId } from '../../../utils';
+import { transformToChatGmUserId } from '../../../services/matrix-service/utils';
 
 export const GroupRoomList = () => {
     const { rooms, selectedRoom, setSelectedRoom } = useMatrixContext();
@@ -32,7 +32,9 @@ export const GroupRoomList = () => {
                         <Text fw={700}>[ {r.name} ]</Text>
 
                         <Text underline>
-                            {getUserId(latestEvent?.sender?.userId)}
+                            {transformToChatGmUserId(
+                                latestEvent?.sender?.userId
+                            )}
                             {' | '}
                             {dayjs(
                                 latestEvent?.event.origin_server_ts

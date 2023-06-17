@@ -11,7 +11,7 @@ export function transformToMatrixUserId(chatGmUserId: string) {
 }
 
 export function transformToChatGmUserId(matrixUserId?: string) {
-    if (!matrixUserId) return null;
+    if (!matrixUserId) return '';
 
     return matrixUserId.replace('@', '').split(':')[0];
 }

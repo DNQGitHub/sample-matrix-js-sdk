@@ -1,9 +1,9 @@
 import { Box, Button, Stack, Text } from '@mantine/core';
-import { getUserId } from '../../../utils';
 import dayjs from 'dayjs';
 import { MessageComposer } from './message-composer';
 import React from 'react';
 import { useChatBoxContext } from './chat-box-context';
+import { transformToChatGmUserId } from '../../../services/matrix-service/utils';
 
 export const ChatBox = () => {
     const boxRef: React.RefObject<HTMLDivElement> = React.useRef<any>(null);
@@ -69,7 +69,7 @@ export const ChatBox = () => {
                                 }}
                             >
                                 <Text fw={500} size={20} underline>
-                                    {getUserId(e.sender?.userId)}
+                                    {transformToChatGmUserId(e.sender?.userId)}
                                     {' | '}
                                     {dayjs(e.event.origin_server_ts).format(
                                         'YYYY-MM-DD | hh:mm:ss'
