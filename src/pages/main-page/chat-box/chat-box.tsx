@@ -1,6 +1,6 @@
+import React from 'react';
 import { Box, Button, Stack, Text } from '@mantine/core';
 import { MessageComposer } from './message-composer';
-import React from 'react';
 import { useChatBoxContext } from './chat-box-context';
 import { EventMessage } from './message/event-message/event-message';
 
