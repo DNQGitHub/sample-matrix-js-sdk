@@ -10,10 +10,9 @@ export const AuthInfo = () => {
                 component="pre"
                 my={0}
                 style={{
-                    // @ts-ignore
-                    textWrap: 'wrap',
                     wordBreak: 'break-all',
                     wordWrap: 'break-word',
+                    whiteSpace: 'break-spaces'
                 }}
             >
                 {JSON.stringify(auth, null, 4)}
