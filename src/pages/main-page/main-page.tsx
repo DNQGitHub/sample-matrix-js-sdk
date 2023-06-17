@@ -3,6 +3,8 @@ import { ActionBar } from './action-bar/action-bar';
 import { RoomList } from './room-list/room-list';
 import { ChatBox } from './chat-box/chat-box';
 import { ChatBoxProvider } from './chat-box/chat-box-context';
+import { LoginForm } from './login-form/login-form';
+import { AuthInfo } from './auth-info';
 
 export const MainPage = () => {
     return (
@@ -10,6 +12,10 @@ export const MainPage = () => {
             <Container>
                 <Stack>
                     <Title transform="uppercase">Main Page</Title>
+
+                    <LoginForm />
+
+                    <AuthInfo />
 
                     <ActionBar />
 

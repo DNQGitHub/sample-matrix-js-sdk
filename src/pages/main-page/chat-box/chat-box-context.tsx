@@ -2,6 +2,8 @@ import React, { PropsWithChildren } from 'react';
 import { useMatrixContext } from '../../../contexts';
 import { EventStatus, MatrixEvent, Room } from 'matrix-js-sdk';
 
+// -------------------------------------------
+
 export type ChatBoxContextValue = {
     clientUserId?: string | null;
     room?: Room;
@@ -14,8 +16,6 @@ export type ChatBoxContextValue = {
     handleLoadPreviousEvents: () => void;
 };
 
-export type ChatBoxProviderProps = PropsWithChildren<{}>;
-
 export const ChatBoxContext = React.createContext<ChatBoxContextValue>(
     {} as ChatBoxContextValue
 );
@@ -27,6 +27,10 @@ export const useChatBoxContext = () => {
 
     return context;
 };
+
+// -------------------------------------------
+
+export type ChatBoxProviderProps = PropsWithChildren<{}>;
 
 export const ChatBoxProvider = ({ children }: ChatBoxProviderProps) => {
     const shouldShowLatestEventRef = React.useRef(true);
@@ -41,21 +45,21 @@ export const ChatBoxProvider = ({ children }: ChatBoxProviderProps) => {
     }, [selectedRoom]);
 
     const handleSendTextMessage = async (textMessage: string) => {
-        if (!selectedRoom || !matrixClient || !textMessage?.trim()) return;
+        if (!selectedRoom || !textMessage?.trim()) return;
 
         shouldShowLatestEventRef.current = true;
         matrixClient.sendTextMessage(selectedRoom.roomId, textMessage);
     };
 
     const handleResendEvent = (event: MatrixEvent) => {
-        if (!matrixClient || !selectedRoom) return;
+        if (!selectedRoom) return;
         if (event.status !== EventStatus.NOT_SENT) return;
 
         matrixClient.resendEvent(event, selectedRoom);
     };
 
     const handleLoadPreviousEvents = () => {
-        if (!matrixClient || !selectedRoom) return;
+        if (!selectedRoom) return;
 
         shouldShowLatestEventRef.current = false;
         matrixClient.scrollback(selectedRoom);

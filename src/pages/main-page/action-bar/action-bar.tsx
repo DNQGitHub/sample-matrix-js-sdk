@@ -1,5 +1,6 @@
 import { Button, Flex } from '@mantine/core';
 import { useActionBar } from './use-action-bar';
+import { useAuthStore } from '../../../stores/auth-store';
 
 export const ActionBar = () => {
     const {
@@ -10,25 +11,33 @@ export const ActionBar = () => {
         handleCreateGroupRoom,
     } = useActionBar();
 
+    const isLogined = useAuthStore((s) => s.authChatGmUser && s.authMatrixUser);
+
     return (
         <Flex gap={10}>
-            <Button disabled={!!matrixClient} onClick={handleStartMatrixClient}>
+            <Button
+                disabled={!isLogined || matrixClient.clientRunning}
+                onClick={handleStartMatrixClient}
+            >
                 Start
             </Button>
 
-            <Button disabled={!!!matrixClient} onClick={handleStopMatrixClient}>
+            <Button
+                disabled={!isLogined || !matrixClient.clientRunning}
+                onClick={handleStopMatrixClient}
+            >
                 Stop
             </Button>
 
             <Button
-                disabled={!!!matrixClient}
+                disabled={!isLogined || !matrixClient.clientRunning}
                 onClick={() => handleCreateSoloRoom()}
             >
                 Create Solo Room
             </Button>
 
             <Button
-                disabled={!!!matrixClient}
+                disabled={!isLogined || !matrixClient.clientRunning}
                 onClick={() => handleCreateGroupRoom()}
             >
                 Create Group Room

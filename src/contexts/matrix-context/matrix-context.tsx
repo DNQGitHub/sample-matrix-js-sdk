@@ -1,37 +1,49 @@
 import React, { PropsWithChildren } from 'react';
-import MatrixSdk, {
-    MatrixClient,
+import {
     ClientEvent,
     Room,
-    ICreateClientOpts,
     RoomEvent,
     MatrixEvent,
     PendingEventOrdering,
 } from 'matrix-js-sdk';
 import { ISyncStateData, SyncState } from 'matrix-js-sdk/lib/sync';
+import { MatrixService } from '../../services';
+
+// -------------------------------------------------
 
 export type MatrixContextValue = {
-    matrixClient?: MatrixClient;
+    matrixClient: MatrixService;
     rooms: Array<Room>;
     selectedRoom?: Room;
-    startMatrixClient: (opts: ICreateClientOpts) => void;
+    startMatrixClient: () => void;
     stopMatrixClient: () => void;
     setSelectedRoom: (room: Room) => void;
 };
-
-export type MatrixProviderProps = PropsWithChildren<{}>;
 
 export const MatrixContext = React.createContext<MatrixContextValue>(
     {} as MatrixContextValue
 );
 
+export const useMatrixContext = () => {
+    const context = React.useContext(MatrixContext);
+
+    if (!context) throw new Error('Miss wrapping with MatrixContext.Provider');
+
+    return context;
+};
+
+// -------------------------------------------------
+
+export type MatrixProviderProps = PropsWithChildren<{}>;
+
+const matrixClient = MatrixService.createClient({});
+
 export const MatrixProvider = ({ children }: MatrixProviderProps) => {
-    const [matrixClient, setMatrixClient] = React.useState<MatrixClient>();
     const [rooms, setRooms] = React.useState<Array<Room>>([]);
     const [selectedRoom, setSelectedRoom] = React.useState<Room>();
 
-    const startMatrixClient = (opts: ICreateClientOpts) => {
-        const matrixClient = MatrixSdk.createClient(opts);
+    const startMatrixClient = async () => {
+        if (matrixClient.clientRunning) return;
 
         matrixClient.once(
             ClientEvent.Sync,
@@ -43,8 +55,7 @@ export const MatrixProvider = ({ children }: MatrixProviderProps) => {
                 console.log('sync-event', { state, lastState, data });
 
                 if (state !== SyncState.Prepared) return;
-
-                setMatrixClient(matrixClient);
+                console.log({ aaaa: matrixClient.getRooms() });
                 setRooms(matrixClient.getRooms());
             }
         );
@@ -83,14 +94,13 @@ export const MatrixProvider = ({ children }: MatrixProviderProps) => {
         });
     };
 
-    const stopMatrixClient = () => {
-        if (!matrixClient) return;
+    const stopMatrixClient = async () => {
+        if (!matrixClient.clientRunning) return;
 
         matrixClient.removeAllListeners();
         matrixClient.stopClient();
         setSelectedRoom(undefined);
         setRooms([]);
-        setMatrixClient(undefined);
     };
 
     return (
@@ -107,12 +117,4 @@ export const MatrixProvider = ({ children }: MatrixProviderProps) => {
             {children}
         </MatrixContext.Provider>
     );
-};
-
-export const useMatrixContext = () => {
-    const context = React.useContext(MatrixContext);
-
-    if (!context) throw new Error('Miss wrapping with MatrixContext.Provider');
-
-    return context;
 };

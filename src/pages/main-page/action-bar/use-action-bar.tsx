@@ -7,6 +7,7 @@ import {
     makeRoomName,
     resolvePromise,
 } from '../../../utils';
+import { useAuthStore } from '../../../stores/auth-store';
 
 export const useActionBar = () => {
     const {
@@ -16,25 +17,23 @@ export const useActionBar = () => {
         setSelectedRoom,
     } = useMatrixContext();
 
-    const handleStartMatrixClient = () => {
-        if (matrixClient) return;
+    const isLogined = useAuthStore(
+        (s) => !!s.authChatGmUser && !!s.authMatrixUser
+    );
 
-        startMatrixClient({
-            baseUrl: 'https://matrix.tauhu.cloud',
-            userId: '@gm.qtest1:matrix.tauhu.cloud',
-            accessToken: 'syt_Z20ucXRlc3Qx_pSAbqeJzXYiXLAbiAKUy_1UWIWe',
-        });
+    const handleStartMatrixClient = async () => {
+        if (!isLogined) return;
+        startMatrixClient();
     };
 
-    const handleStopMatrixClient = () => {
-        if (!matrixClient) return;
-
+    const handleStopMatrixClient = async () => {
+        if (!isLogined) return;
         stopMatrixClient();
     };
 
     const handleCreateSoloRoom = async (targetUserId: string = 'gm.qtest4') => {
         try {
-            if (!matrixClient) return;
+            if (!isLogined) return;
 
             const matrixClientUserId = matrixClient.getUserId();
             if (!matrixClientUserId) return;
@@ -81,7 +80,7 @@ export const useActionBar = () => {
         targetUserIds: Array<string> = ['gm.qtest2', 'gm.qtest5']
     ) => {
         try {
-            if (!matrixClient) return;
+            if (!isLogined) return;
 
             const matrixClientUserId = matrixClient.getUserId();
             if (!matrixClientUserId) return;
