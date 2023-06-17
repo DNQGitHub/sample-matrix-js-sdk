@@ -14,7 +14,7 @@ export const EventMessage = ({ event }: EventMessageProps) => {
                 style={{
                     wordBreak: 'break-all',
                     wordWrap: 'break-word',
-                    whiteSpace: 'break-spaces'
+                    whiteSpace: 'break-spaces',
                 }}
             >
                 {JSON.stringify(
