@@ -20,11 +20,11 @@ export const MainPage = () => {
                     <ActionBar />
 
                     <Flex w={'100%'} gap={8}>
-                        <Box style={{ flex: 2 }}>
+                        <Box style={{ flex: 3 }}>
                             <RoomList />
                         </Box>
 
-                        <Box style={{ flex: 3 }}>
+                        <Box style={{ flex: 5 }}>
                             <ChatBoxProvider>
                                 <ChatBox />
                             </ChatBoxProvider>

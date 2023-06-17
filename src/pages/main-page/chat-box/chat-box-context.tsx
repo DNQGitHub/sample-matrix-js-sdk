@@ -1,18 +1,16 @@
 import React, { PropsWithChildren } from 'react';
-import { EventStatus, MatrixEvent, Room } from 'matrix-js-sdk';
+import { MatrixEvent, Room } from 'matrix-js-sdk';
 import { useMatrixContext } from '~/services/matrix-service/matrix-context';
 
 // -------------------------------------------
 
 export type ChatBoxContextValue = {
-    clientUserId?: string | null;
     room?: Room;
     events: Array<MatrixEvent>;
 
     shouldShowLatestEvent: boolean;
 
     handleSendTextMessage: (textMessage: string) => void;
-    handleResendEvent: (event: MatrixEvent) => void;
     handleLoadPreviousEvents: () => void;
 };
 
@@ -51,13 +49,6 @@ export const ChatBoxProvider = ({ children }: ChatBoxProviderProps) => {
         matrixClient.sendTextMessage(selectedRoom.roomId, textMessage);
     };
 
-    const handleResendEvent = (event: MatrixEvent) => {
-        if (!selectedRoom) return;
-        if (event.status !== EventStatus.NOT_SENT) return;
-
-        matrixClient.resendEvent(event, selectedRoom);
-    };
-
     const handleLoadPreviousEvents = () => {
         if (!selectedRoom) return;
 
@@ -68,14 +59,12 @@ export const ChatBoxProvider = ({ children }: ChatBoxProviderProps) => {
     return (
         <ChatBoxContext.Provider
             value={{
-                clientUserId: matrixClient?.getUserId(),
                 room: selectedRoom,
                 events: [...timelineEvents, ...pendingEvents],
 
                 shouldShowLatestEvent: shouldShowLatestEventRef.current,
 
                 handleSendTextMessage,
-                handleResendEvent,
                 handleLoadPreviousEvents,
             }}
         >
