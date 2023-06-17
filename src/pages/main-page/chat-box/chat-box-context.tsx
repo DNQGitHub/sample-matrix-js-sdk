@@ -1,21 +1,20 @@
 import React, { PropsWithChildren } from 'react';
-import { EventStatus, EventType, MatrixEvent, Room } from 'matrix-js-sdk';
+import { EventStatus, MatrixEvent, Room } from 'matrix-js-sdk';
 import { useMatrixContext } from '~/services/matrix-service/matrix-context';
+import { Reactions } from '~/services/matrix-service/dtos';
 
 // -------------------------------------------
 
 export type ChatBoxContextValue = {
     room?: Room;
     events: Array<MatrixEvent>;
-
     shouldShowLatestEvent: boolean;
-
     handleSendTextMessage: (textMessage: string) => Promise<void>;
     handleLoadPreviousEvents: () => Promise<void>;
     handleResendEvent: (event: MatrixEvent) => Promise<void>;
     handleReactEvent: (
         event: MatrixEvent,
-        reaction: 'like' | 'haha' | 'angry'
+        reaction: Reactions
     ) => Promise<void>;
 };
 
@@ -71,18 +70,12 @@ export const ChatBoxProvider = ({ children }: ChatBoxProviderProps) => {
 
     const handleReactEvent = async (
         event: MatrixEvent,
-        reaction: 'like' | 'haha' | 'angry'
+        reaction: Reactions
     ) => {
         if (!selectedRoom) return;
 
         shouldShowLatestEventRef.current = false;
-        await matrixClient.sendEvent(selectedRoom.roomId, EventType.Reaction, {
-            'm.relates_to': {
-                event_id: event.getId(),
-                key: reaction,
-                rel_type: 'm.annotation',
-            },
-        });
+        await matrixClient.sendReaction(selectedRoom, event, reaction);
     };
 
     return (

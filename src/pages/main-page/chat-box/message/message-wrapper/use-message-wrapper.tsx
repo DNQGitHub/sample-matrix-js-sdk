@@ -2,6 +2,7 @@ import { EventType, MatrixEvent } from 'matrix-js-sdk';
 import { useMatrixContext } from '~/services/matrix-service/matrix-context';
 import { useChatBoxContext } from '../../chat-box-context';
 import React from 'react';
+import { Reactions } from '~/services/matrix-service/dtos';
 
 export const useMessageWrapper = (event: MatrixEvent) => {
     const [reactions, setReactions] = React.useState<Array<MatrixEvent>>([]);
@@ -37,7 +38,7 @@ export const useMessageWrapper = (event: MatrixEvent) => {
         handleResendEvent: () => {
             handleResendEvent(event);
         },
-        handleReactEvent: (reaction: 'like' | 'haha' | 'angry') => {
+        handleReactEvent: (reaction: Reactions) => {
             handleReactEvent(event, reaction).then(() => fetchReactions());
         },
     };

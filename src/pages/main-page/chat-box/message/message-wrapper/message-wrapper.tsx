@@ -4,6 +4,7 @@ import { PropsWithChildren } from 'react';
 import { useMessageWrapper } from './use-message-wrapper';
 import { transformToChatGmUserId } from '~/services/matrix-service/utils';
 import dayjs from 'dayjs';
+import { Reactions } from '~/services/matrix-service/dtos';
 
 export type MessageWrapperProps = PropsWithChildren<{
     event: MatrixEvent;
@@ -64,13 +65,19 @@ export const MessageWrapper = ({ children, event }: MessageWrapperProps) => {
 
                 {!isSelf && (
                     <Flex gap={5}>
-                        <Button onClick={() => handleReactEvent('like')}>
+                        <Button
+                            onClick={() => handleReactEvent(Reactions.LIKE)}
+                        >
                             Like
                         </Button>
-                        <Button onClick={() => handleReactEvent('haha')}>
+                        <Button
+                            onClick={() => handleReactEvent(Reactions.SMILE)}
+                        >
                             Haha
                         </Button>
-                        <Button onClick={() => handleReactEvent('angry')}>
+                        <Button
+                            onClick={() => handleReactEvent(Reactions.ANGRY)}
+                        >
                             Angry
                         </Button>
                     </Flex>
