@@ -60,8 +60,6 @@ export const useMessageWrapper = (
   };
 
   const sendReadReceipt = async () => {
-    console.log("---> call send readReceipt", event.status, event.getId());
-
     if (!room) return;
 
     const eventId = event.getId();
@@ -73,9 +71,7 @@ export const useMessageWrapper = (
     if (event.status !== null && event.status !== EventStatus.SENT) return;
     if (index < events.length - 1) return;
 
-    console.log("---> start send readReceipt", event.getId());
     await matrixClient.sendReadReceipt(event);
-    console.log("---> readReceipt sent", event.getId());
   };
 
   const handleResendEvent = async () => {
