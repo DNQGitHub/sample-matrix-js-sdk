@@ -82,7 +82,7 @@ export const useMessageWrapper = (
     };
 
     React.useEffect(() => {
-        // fetchReactions();
+        fetchReactions();
     }, []);
 
     React.useEffect(() => {
