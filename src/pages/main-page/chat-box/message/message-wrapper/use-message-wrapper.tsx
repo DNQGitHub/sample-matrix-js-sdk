@@ -1,99 +1,110 @@
-import { EventStatus, MatrixEvent } from 'matrix-js-sdk';
-import { useMatrixContext } from '~/services/matrix-service/matrix-context';
-import { useChatBoxContext } from '../../chat-box-context';
-import React from 'react';
-import { EReaction } from '~/services/matrix-service/dtos';
+import { EventStatus, MatrixEvent } from "matrix-js-sdk";
+import { useMatrixContext } from "~/services/matrix-service/matrix-context";
+import { useChatBoxContext } from "../../chat-box-context";
+import React from "react";
+import { EReaction } from "~/services/matrix-service/dtos";
 
 export const useMessageWrapper = (
-    event: MatrixEvent,
-    index: number,
-    events: MatrixEvent[]
+  event: MatrixEvent,
+  index: number,
+  events: MatrixEvent[]
 ) => {
-    const [reactions, setReactions] = React.useState<Array<MatrixEvent>>([]);
+  const [reactions, setReactions] = React.useState<Array<MatrixEvent>>([]);
+  const [readUserIds, setReadUserIds] = React.useState<Array<string>>([]);
 
-    const { matrixClient } = useMatrixContext();
-    const { room, ...chatBox } = useChatBoxContext();
+  const { matrixClient } = useMatrixContext();
+  const { room, ...chatBox } = useChatBoxContext();
 
-    const isSelf = matrixClient.getUserId() === event.getSender();
-    const readUserIds = React.useMemo(() => {
-        if (!room) return [];
+  const isSelf = matrixClient.getUserId() === event.getSender();
 
-        if (event.status) return [];
+  const fetchReactions = async () => {
+    if (!room) return;
 
-        const roomMembers = room.getMembers();
+    const eventId = event.getId();
 
-        const readLog = roomMembers.map((member) => {
-            const readReceipt = room.getReadReceiptForUserId(member.userId);
+    if (!eventId) return;
 
-            return {
-                userId: member.userId,
-                readTs: readReceipt?.data.ts,
-            };
-        });
+    const events = await matrixClient.fetchReactions(room.roomId, eventId);
+    setReactions(events);
+  };
 
-        const eventTs = event.getTs();
+  const getReadUserIds = async () => {
+    if (!room) {
+      setReadUserIds([]);
+      return;
+    }
 
-        return readLog
-            .filter((log) => log.readTs && log.readTs >= eventTs)
-            .map((log) => log.userId);
-    }, [room, event.status]);
+    if (event.status && event.status !== EventStatus.SENT) {
+      setReadUserIds([]);
+      return;
+    }
 
-    const fetchReactions = async () => {
-        if (!room) return;
+    const roomMembers = room.getMembers();
 
-        const eventId = event.getId();
+    const readLog = roomMembers.map((member) => {
+      const readReceipt = room.getReadReceiptForUserId(member.userId);
 
-        if (!eventId) return;
+      return {
+        userId: member.userId,
+        readTs: readReceipt?.data.ts,
+      };
+    });
 
-        const events = await matrixClient.fetchReactions(room.roomId, eventId);
-        setReactions(events);
-    };
+    const eventTs = event.getTs();
 
-    const sendReadReceipt = async () => {
-        console.log('---> call send readReceipt', event.status, event.getId());
+    const readUserIds = readLog
+      .filter((log) => log.readTs && log.readTs >= eventTs)
+      .map((log) => log.userId);
 
-        if (!room) return;
+    setReadUserIds(readUserIds);
+  };
 
-        const eventId = event.getId();
-        if (!eventId) return;
+  const sendReadReceipt = async () => {
+    console.log("---> call send readReceipt", event.status, event.getId());
 
-        const isPending = !!room.getPendingEvent(eventId);
-        if (isPending) return;
+    if (!room) return;
 
-        if (event.status !== null && event.status !== EventStatus.SENT) return;
-        if (index < events.length - 1) return;
+    const eventId = event.getId();
+    if (!eventId) return;
 
-        console.log('---> start send readReceipt', event.getId());
-        await matrixClient.sendReadReceipt(event);
-        console.log('---> readReceipt sent', event.getId());
-    };
+    const isPending = !!room.getPendingEvent(eventId);
+    if (isPending) return;
 
-    const handleResendEvent = async () => {
-        await chatBox.handleResendEvent(event);
-    };
+    if (event.status !== null && event.status !== EventStatus.SENT) return;
+    if (index < events.length - 1) return;
 
-    const handleReactEvent = async (reaction: EReaction) => {
-        const eventId = event.getId();
+    console.log("---> start send readReceipt", event.getId());
+    await matrixClient.sendReadReceipt(event);
+    console.log("---> readReceipt sent", event.getId());
+  };
 
-        if (!eventId) return;
+  const handleResendEvent = async () => {
+    await chatBox.handleResendEvent(event);
+  };
 
-        await chatBox.handleReactEvent(eventId, reaction);
-        fetchReactions();
-    };
+  const handleReactEvent = async (reaction: EReaction) => {
+    const eventId = event.getId();
 
-    React.useEffect(() => {
-        fetchReactions();
-    }, []);
+    if (!eventId) return;
 
-    React.useEffect(() => {
-        sendReadReceipt();
-    }, [event.status]);
+    await chatBox.handleReactEvent(eventId, reaction);
+    fetchReactions();
+  };
 
-    return {
-        isSelf,
-        readUserIds,
-        reactions,
-        handleResendEvent,
-        handleReactEvent,
-    };
+  React.useEffect(() => {
+    fetchReactions();
+    sendReadReceipt().then(() => getReadUserIds());
+  }, []);
+
+  React.useEffect(() => {
+    sendReadReceipt().then(() => getReadUserIds());
+  }, [event.status]);
+
+  return {
+    isSelf,
+    readUserIds,
+    reactions,
+    handleResendEvent,
+    handleReactEvent,
+  };
 };
