@@ -1,5 +1,5 @@
 import { Box, Button, Flex, Stack, Text } from '@mantine/core';
-import { EventStatus, MatrixEvent } from 'matrix-js-sdk';
+import { EventStatus, EventType, MatrixEvent } from 'matrix-js-sdk';
 import { PropsWithChildren } from 'react';
 import { useMessageWrapper } from './use-message-wrapper';
 import { transformToChatGmUserId } from '~/services/matrix-service/utils';
@@ -61,7 +61,7 @@ export const MessageWrapper = ({
                     ))}
                 </Box>
 
-                <Flex gap={5} justify="flex-end">
+                <Flex gap={5} justify="flex-end" wrap="wrap-reverse">
                     {reactions.map((r) => (
                         <Text
                             key={r.getId()}
@@ -84,22 +84,50 @@ export const MessageWrapper = ({
                     <Button onClick={() => handleResendEvent()}>Resend</Button>
                 )}
 
-                {!isSelf && (
+                {event.getType() === EventType.RoomMessage && (
                     <Flex gap={5}>
                         <Button
-                            onClick={() => handleReactEvent(EReaction.LIKE)}
+                            onClick={() => handleReactEvent(EReaction.GRINNING)}
                         >
-                            Like
+                            {EReaction.GRINNING.toString()}
                         </Button>
+
                         <Button
-                            onClick={() => handleReactEvent(EReaction.SMILE)}
+                            onClick={() => handleReactEvent(EReaction.LAUGHING)}
                         >
-                            Haha
+                            {EReaction.LAUGHING.toString()}
                         </Button>
+
                         <Button
-                            onClick={() => handleReactEvent(EReaction.ANGRY)}
+                            onClick={() =>
+                                handleReactEvent(EReaction.KISSING_HEART)
+                            }
                         >
-                            Angry
+                            {EReaction.KISSING_HEART.toString()}
+                        </Button>
+
+                        <Button
+                            onClick={() =>
+                                handleReactEvent(EReaction.HEART_EYES)
+                            }
+                        >
+                            {EReaction.HEART_EYES.toString()}
+                        </Button>
+
+                        <Button
+                            onClick={() =>
+                                handleReactEvent(EReaction.COLD_FACE)
+                            }
+                        >
+                            {EReaction.COLD_FACE.toString()}
+                        </Button>
+
+                        <Button
+                            onClick={() =>
+                                handleReactEvent(EReaction.SWEAT_SMILE)
+                            }
+                        >
+                            {EReaction.SWEAT_SMILE.toString()}
                         </Button>
                     </Flex>
                 )}

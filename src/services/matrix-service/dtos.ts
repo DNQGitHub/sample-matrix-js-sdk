@@ -4,7 +4,10 @@ export type LoginWithAccessTokenResponse = {
 };
 
 export enum EReaction {
-    LIKE = 'like',
-    SMILE = 'smile',
-    ANGRY = 'angry',
+    GRINNING = ':grinning:',
+    KISSING_HEART = ':kissing_heart:',
+    LAUGHING = ':laughing:',
+    HEART_EYES = ':heart_eyes:',
+    SWEAT_SMILE = ':sweat_smile:',
+    COLD_FACE = ':cold_face:',
 }
