@@ -1,5 +1,6 @@
-import { Box, ScrollArea, Stack, Text } from '@mantine/core';
+import { ScrollArea, Stack } from '@mantine/core';
 import { useChatRoomContext } from '../chat-room-context';
+import { EventListItem } from './event-list-item';
 
 export const EventList = () => {
     const { events } = useChatRoomContext();
@@ -11,23 +12,11 @@ export const EventList = () => {
             style={{
                 border: '1px solid black',
                 borderRadius: 8,
-                whiteSpace: 'pre-wrap',
-                wordWrap: 'break-word',
             }}
         >
             <Stack>
-                {events.map((e) => (
-                    <Box>
-                        <Text
-                            component="pre"
-                            style={{
-                                whiteSpace: 'pre-wrap',
-                                wordWrap: 'break-word',
-                            }}
-                        >
-                            {JSON.stringify(e.getContent(), null, 4)}
-                        </Text>
-                    </Box>
+                {events.map((e, index, events) => (
+                    <EventListItem event={e} index={index} events={events} />
                 ))}
             </Stack>
         </ScrollArea>

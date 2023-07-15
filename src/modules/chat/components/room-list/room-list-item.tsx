@@ -21,9 +21,11 @@ export const RoomListItem = ({ room }: RoomListItemProps) => {
     return (
         <UnstyledButton
             style={{
-                border: `1px solid ${isSelected ? '#f0a24f' : 'black'}`,
+                border: `2px solid ${isSelected ? '#fa9c4a' : '#dedede'}`,
                 borderRadius: 8,
-                backgroundColor: isSelected ? '#f0a24f' : undefined,
+                boxShadow: isSelected
+                    ? 'rgba(17, 17, 26, 0.1) 0px 4px 16px, rgba(17, 17, 26, 0.05) 0px 8px 32px'
+                    : undefined,
             }}
             px={16}
             py={8}

@@ -10,7 +10,9 @@ export type ChatRoomProps = {
 };
 
 export const ChatRoom = ({ roomId, style }: ChatRoomProps) => {
-    const { room, events, initializeHandler } = useChatRoom({ roomId });
+    const { room, events, eventReadUpToId, initializeHandler } = useChatRoom({
+        roomId,
+    });
 
     if (!roomId) {
         return null;
@@ -42,6 +44,7 @@ export const ChatRoom = ({ roomId, style }: ChatRoomProps) => {
             value={{
                 room,
                 events,
+                eventReadUpToId,
             }}
         >
             <Stack
