@@ -1,6 +1,6 @@
 import { ScrollArea, Stack } from '@mantine/core';
 import { useChatRoomContext } from '../chat-room-context';
-import { EventListItem } from './event-list-item';
+import { EventListItem } from './event-list-item/event-list-item';
 
 export const EventList = () => {
     const { events } = useChatRoomContext();
@@ -16,7 +16,12 @@ export const EventList = () => {
         >
             <Stack>
                 {events.map((e, index, events) => (
-                    <EventListItem event={e} index={index} events={events} />
+                    <EventListItem
+                        key={`${e.getId()}-${index}`}
+                        event={e}
+                        index={index}
+                        events={events}
+                    />
                 ))}
             </Stack>
         </ScrollArea>

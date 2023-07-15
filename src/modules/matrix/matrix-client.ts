@@ -152,7 +152,52 @@ export class MatrixClient extends BaseMatrixClient {
     }
 
     async sendReaction(roomId: string, eventId: string, reaction: string) {
-        return await this.sendEvent(roomId, EventType.Reaction, {
+        const reactionEvents = await this.fetchReactions(roomId, eventId);
+
+        const sameReactionEventSent = reactionEvents.find((e) => {
+            const isSelf = this.getUserId() === e.getSender();
+            const eventKey = e.getContent()['m.relates_to']?.key;
+            return isSelf && eventKey === reaction;
+        });
+
+        if (sameReactionEventSent) {
+            const sameReactionEventSentId = sameReactionEventSent.getId();
+            if (sameReactionEventSentId) {
+                await this.redactEvent(
+                    roomId,
+                    sameReactionEventSentId,
+                    undefined,
+                    {
+                        reason: 'client:toggle-reaction',
+                    }
+                );
+            }
+            return;
+        }
+
+        const otherReactionEvents = reactionEvents.filter((e) => {
+            const isSelf = this.getUserId() === e.getSender();
+            return isSelf;
+        });
+
+        if (otherReactionEvents.length > 0) {
+            for (let i = 0; i < otherReactionEvents.length; ++i) {
+                const otherReactionEvent = otherReactionEvents[i];
+                const otherReactionEventId = otherReactionEvent.getId();
+                if (otherReactionEventId) {
+                    await this.redactEvent(
+                        roomId,
+                        otherReactionEventId,
+                        undefined,
+                        {
+                            reason: 'client:replace-reaction',
+                        }
+                    );
+                }
+            }
+        }
+
+        await this.sendEvent(roomId, EventType.Reaction, {
             'm.relates_to': {
                 event_id: eventId,
                 key: reaction,
