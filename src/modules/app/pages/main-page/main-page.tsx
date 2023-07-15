@@ -14,11 +14,14 @@ export const MainPage = () => {
                 <LoginForm />
                 <AuthBox />
 
-                <Flex gap={12}>
-                    <RoomList onRoomSelected={setCurrentRoom} />
+                <Flex gap={12} align={'stretch'}>
+                    <RoomList
+                        onRoomSelected={setCurrentRoom}
+                        style={{ flex: 3 }}
+                    />
                     <ChatRoom
                         roomId={currentRoom?.roomId}
-                        style={{ flex: 2 }}
+                        style={{ flex: 4 }}
                     />
                 </Flex>
             </Stack>

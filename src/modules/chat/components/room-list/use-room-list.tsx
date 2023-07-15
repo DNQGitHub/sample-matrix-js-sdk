@@ -1,5 +1,5 @@
 import { Room, RoomEvent } from 'matrix-js-sdk';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useAuthContext } from '~/modules/auth/contexts/auth-context/auth-context';
 import { matrixClient } from '~/modules/matrix/matrix-client';
 
@@ -7,6 +7,16 @@ export const useRoomList = () => {
     const { hasUserLogined } = useAuthContext();
     const [rooms, setRooms] = useState<Array<Room>>([]);
     const [selectedRoom, setSelectedRoom] = useState<Room>();
+
+    const sortedRooms = useMemo(
+        () =>
+            rooms.sort((r1, r2) => {
+                return (
+                    r2.getLastActiveTimestamp() - r1.getLastActiveTimestamp()
+                );
+            }),
+        [rooms]
+    );
 
     useEffect(() => {
         const handleRoomTimeline = () => {
@@ -29,5 +39,5 @@ export const useRoomList = () => {
         }
     }, [hasUserLogined]);
 
-    return { rooms, selectedRoom, setSelectedRoom };
+    return { rooms, sortedRooms, selectedRoom, setSelectedRoom };
 };

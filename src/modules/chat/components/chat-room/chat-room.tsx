@@ -2,6 +2,7 @@ import { Box, Stack, Text } from '@mantine/core';
 import { useChatRoom } from './use-chat-room';
 import { ChatRoomContext } from './chat-room-context';
 import { EventList } from './event-list/event-list';
+import { RoomInfo } from './room-info/room-info';
 
 export type ChatRoomProps = {
     roomId?: string;
@@ -32,6 +33,10 @@ export const ChatRoom = ({ roomId, style }: ChatRoomProps) => {
         );
     }
 
+    if (!room) {
+        return null;
+    }
+
     return (
         <ChatRoomContext.Provider
             value={{
@@ -41,7 +46,7 @@ export const ChatRoom = ({ roomId, style }: ChatRoomProps) => {
         >
             <Stack
                 p={20}
-                mah={500}
+                // mah={500}
                 style={{
                     border: '1px solid black',
                     borderRadius: 8,
@@ -49,6 +54,7 @@ export const ChatRoom = ({ roomId, style }: ChatRoomProps) => {
                     ...style,
                 }}
             >
+                <RoomInfo />
                 <EventList />
             </Stack>
         </ChatRoomContext.Provider>

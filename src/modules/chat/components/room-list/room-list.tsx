@@ -13,7 +13,7 @@ export type RoomListProps = {
 
 export const RoomList = ({ style, onRoomSelected }: RoomListProps) => {
     const { hasUserLogined } = useAuthContext();
-    const { rooms, selectedRoom, setSelectedRoom } = useRoomList();
+    const { sortedRooms, selectedRoom, setSelectedRoom } = useRoomList();
 
     useEffect(() => {
         if (selectedRoom) onRoomSelected?.(selectedRoom);
@@ -26,7 +26,7 @@ export const RoomList = ({ style, onRoomSelected }: RoomListProps) => {
     return (
         <RoomListContext.Provider
             value={{
-                rooms,
+                rooms: sortedRooms,
                 selectedRoom,
                 setSelectedRoom,
             }}
@@ -39,13 +39,14 @@ export const RoomList = ({ style, onRoomSelected }: RoomListProps) => {
                     ...style,
                 }}
                 p={20}
+                h={800}
             >
-                {!rooms?.length ? (
+                {!sortedRooms?.length ? (
                     <Text>Empty</Text>
                 ) : (
-                    <ScrollArea mah={500}>
+                    <ScrollArea>
                         <Stack>
-                            {rooms.map((room) => (
+                            {sortedRooms.map((room) => (
                                 <RoomListItem key={room.roomId} room={room} />
                             ))}
                         </Stack>

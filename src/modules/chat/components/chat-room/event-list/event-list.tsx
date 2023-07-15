@@ -7,7 +7,13 @@ export const EventList = () => {
     return (
         <ScrollArea
             p={20}
-            style={{ border: '1px solid black', borderRadius: 8 }}
+            h={500}
+            style={{
+                border: '1px solid black',
+                borderRadius: 8,
+                whiteSpace: 'pre-wrap',
+                wordWrap: 'break-word',
+            }}
         >
             <Stack>
                 {events.map((e) => (
