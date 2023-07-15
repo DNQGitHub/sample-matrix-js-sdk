@@ -10,10 +10,9 @@ export default defineConfig({
         global: 'window',
     },
     resolve: {
-        alias: ['assets', 'pages', 'services', 'utils'].map((i) => ({
+        alias: ['modules', 'assets', 'pages', 'services', 'utils'].map((i) => ({
             find: `~/${i}`,
             replacement: path.resolve(__dirname, 'src', i),
         })),
     },
 });
-
