@@ -31,7 +31,9 @@ export const useEventListItem = ({
     const showSender = prevEventSender !== sender && !isSelf;
 
     const showDate =
-        !prevEvent || dayjs(event.getTs()).diff(prevEvent.getTs(), 'days') > 0;
+        !prevEvent ||
+        dayjs(event.getTs()).format('YYYY-MMM-DD') !==
+            dayjs(prevEvent.getTs()).format('YYYY-MMM-DD');
 
     const showUnreadIndicator =
         !isSelf &&

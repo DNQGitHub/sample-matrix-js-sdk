@@ -1,4 +1,4 @@
-import { Ref, useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import {
     Anchor,
     Box,
@@ -38,7 +38,6 @@ export type EventListItemProps = {
 };
 
 export const EventListItem = ({ event, index, events }: EventListItemProps) => {
-    const thiz: Ref<HTMLDivElement> = useRef(null);
     const { classes } = useStyles();
 
     const {
@@ -55,7 +54,6 @@ export const EventListItem = ({ event, index, events }: EventListItemProps) => {
 
     useEffect(
         () => {
-            thiz.current?.scrollIntoView();
             sendReadReceipt();
         },
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -64,7 +62,6 @@ export const EventListItem = ({ event, index, events }: EventListItemProps) => {
 
     return (
         <Stack
-            ref={thiz}
             className={classes.container}
             pos={'relative'}
             style={{

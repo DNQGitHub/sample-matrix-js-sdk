@@ -5,6 +5,7 @@ export type ChatRoomContextValue = {
     room?: Room;
     events: MatrixEvent[];
     eventReadUpTo?: MatrixEvent | null;
+    scrollBack: () => Promise<void>;
 };
 
 export const ChatRoomContext = createContext<ChatRoomContextValue>(

@@ -57,6 +57,14 @@ export const useChatRoom = ({ roomId }: UseChatRoomProps) => {
         },
     });
 
+    const scrollBack = async () => {
+        if (!room) {
+            return;
+        }
+
+        await matrixClient.scrollback(room);
+    };
+
     useEffect(
         () => {
             initializeHandler.mutate();
@@ -130,5 +138,5 @@ export const useChatRoom = ({ roomId }: UseChatRoomProps) => {
         };
     }, [room]);
 
-    return { room, events, eventReadUpTo, initializeHandler };
+    return { room, events, eventReadUpTo, initializeHandler, scrollBack };
 };
