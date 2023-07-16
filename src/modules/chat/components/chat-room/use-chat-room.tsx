@@ -26,7 +26,7 @@ export const useChatRoom = ({ roomId }: UseChatRoomProps) => {
                 return;
             }
 
-            const room = matrixClient.getRoom(roomId);
+            const room = await matrixClient.getRoomUntilTimeout(roomId);
 
             if (!room) {
                 throw new Error(`Cannot get room with id ${roomId}`);
