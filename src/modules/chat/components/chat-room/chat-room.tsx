@@ -1,8 +1,9 @@
 import { Box, Stack, Text } from '@mantine/core';
 import { useChatRoom } from './use-chat-room';
 import { ChatRoomContext } from './chat-room-context';
-import { EventList } from './event-list/event-list';
+import { EventList as MessageList } from './event-list/event-list';
 import { RoomInfo } from './room-info/room-info';
+import { MessageInput } from './message-input/message-input';
 
 export type ChatRoomProps = {
     roomId?: string;
@@ -10,7 +11,7 @@ export type ChatRoomProps = {
 };
 
 export const ChatRoom = ({ roomId, style }: ChatRoomProps) => {
-    const { room, events, eventReadUpToId, initializeHandler } = useChatRoom({
+    const { room, events, eventReadUpTo, initializeHandler } = useChatRoom({
         roomId,
     });
 
@@ -44,7 +45,7 @@ export const ChatRoom = ({ roomId, style }: ChatRoomProps) => {
             value={{
                 room,
                 events,
-                eventReadUpToId,
+                eventReadUpTo,
             }}
         >
             <Stack
@@ -58,7 +59,8 @@ export const ChatRoom = ({ roomId, style }: ChatRoomProps) => {
                 }}
             >
                 <RoomInfo />
-                <EventList />
+                <MessageList />
+                <MessageInput />
             </Stack>
         </ChatRoomContext.Provider>
     );

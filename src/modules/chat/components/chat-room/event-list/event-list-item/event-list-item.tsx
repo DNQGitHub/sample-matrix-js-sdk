@@ -1,4 +1,7 @@
+import { Ref, useEffect, useRef } from 'react';
 import {
+    Anchor,
+    Box,
     Flex,
     Image,
     Stack,
@@ -7,7 +10,7 @@ import {
     createStyles,
 } from '@mantine/core';
 import dayjs from 'dayjs';
-import { MatrixEvent } from 'matrix-js-sdk';
+import { EventStatus, MatrixEvent } from 'matrix-js-sdk';
 import { transformToChatGmUserId } from '~/modules/matrix/utils';
 import { useEventListItem } from './use-event-list-item';
 import {
@@ -35,6 +38,9 @@ export type EventListItemProps = {
 };
 
 export const EventListItem = ({ event, index, events }: EventListItemProps) => {
+    const thiz: Ref<HTMLDivElement> = useRef(null);
+    const { classes } = useStyles();
+
     const {
         isSelf,
         sender,
@@ -43,12 +49,22 @@ export const EventListItem = ({ event, index, events }: EventListItemProps) => {
         showUnreadIndicator,
         reactions,
         sendReactionHandler,
+        resendEvent,
+        sendReadReceipt,
     } = useEventListItem({ event, index, events });
 
-    const { classes } = useStyles();
+    useEffect(
+        () => {
+            thiz.current?.scrollIntoView();
+            sendReadReceipt();
+        },
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        []
+    );
 
     return (
         <Stack
+            ref={thiz}
             className={classes.container}
             pos={'relative'}
             style={{
@@ -162,6 +178,21 @@ export const EventListItem = ({ event, index, events }: EventListItemProps) => {
                     </UnstyledButton>
                 ))}
             </Flex>
+
+            <Box>
+                {event.status !== EventStatus.NOT_SENT && (
+                    <Text>{event.status}</Text>
+                )}
+                {event.status === EventStatus.NOT_SENT && (
+                    <Flex>
+                        <Text>
+                            <Anchor onClick={resendEvent}>Resend</Anchor>
+                            {' - '}
+                            {event.status}
+                        </Text>
+                    </Flex>
+                )}
+            </Box>
 
             {showUnreadIndicator && (
                 <Text align="center" w={'100%'}>

@@ -4,7 +4,7 @@ import { createContext, useContext } from 'react';
 export type ChatRoomContextValue = {
     room?: Room;
     events: MatrixEvent[];
-    eventReadUpToId?: string | null;
+    eventReadUpTo?: MatrixEvent | null;
 };
 
 export const ChatRoomContext = createContext<ChatRoomContextValue>(

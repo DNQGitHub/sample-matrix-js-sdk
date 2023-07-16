@@ -27,9 +27,11 @@ export const useRoomList = () => {
         setRooms(matrixClient.getRooms());
 
         matrixClient.on(RoomEvent.Timeline, handleRoomTimeline);
+        matrixClient.on(RoomEvent.Receipt, handleRoomTimeline);
 
         return () => {
             matrixClient.off(RoomEvent.Timeline, handleRoomTimeline);
+            matrixClient.off(RoomEvent.Receipt, handleRoomTimeline);
         };
     }, []);
 

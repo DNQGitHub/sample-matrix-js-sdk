@@ -10,7 +10,7 @@ export type UseChatRoomProps = {
 export const useChatRoom = ({ roomId }: UseChatRoomProps) => {
     const [room, setRoom] = useState<Room>();
     const [events, setEvents] = useState<MatrixEvent[]>([]);
-    const [eventReadUpToId, setEventReadUpToId] = useState<string | null>();
+    const [eventReadUpTo, setEventReadUpTo] = useState<MatrixEvent | null>();
 
     const initializeHandler = useMutation({
         mutationFn: async () => {
@@ -26,8 +26,13 @@ export const useChatRoom = ({ roomId }: UseChatRoomProps) => {
 
             if (myId) {
                 const eventReadUpToId = room.getEventReadUpTo(myId);
-                setEventReadUpToId(eventReadUpToId);
-                console.log({ eventReadUpToId });
+
+                const eventReadUpTo = room
+                    .getLiveTimeline()
+                    .getEvents()
+                    .find((e) => e.getId() === eventReadUpToId);
+
+                setEventReadUpTo(eventReadUpTo);
             }
         },
     });
@@ -64,11 +69,13 @@ export const useChatRoom = ({ roomId }: UseChatRoomProps) => {
         }
 
         matrixClient.on(RoomEvent.Timeline, handleRoomTimeline);
+        matrixClient.on(RoomEvent.LocalEchoUpdated, handleRoomTimeline);
 
         return () => {
             matrixClient.off(RoomEvent.Timeline, handleRoomTimeline);
+            matrixClient.off(RoomEvent.LocalEchoUpdated, handleRoomTimeline);
         };
     }, [room]);
 
-    return { room, events, eventReadUpToId, initializeHandler };
+    return { room, events, eventReadUpTo, initializeHandler };
 };

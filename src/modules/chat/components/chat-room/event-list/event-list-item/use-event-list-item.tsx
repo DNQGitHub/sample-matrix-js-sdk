@@ -16,12 +16,13 @@ export const useEventListItem = ({
     index,
     events,
 }: UseEventListItemProps) => {
-    const { room, eventReadUpToId } = useChatRoomContext();
+    const { room, eventReadUpTo } = useChatRoomContext();
 
     const [reactions, setReactions] = useState<MatrixEvent[]>([]);
 
     const sender = event.getSender();
-    const isSelf = matrixClient.getUserId() === sender;
+    const myId = matrixClient.getUserId();
+    const isSelf = myId === sender;
 
     const prevEvent = index - 1 < 0 ? undefined : events[index - 1];
     const prevEventSender = prevEvent?.getSender();
@@ -32,9 +33,12 @@ export const useEventListItem = ({
         !prevEvent || dayjs(event.getTs()).diff(prevEvent.getTs(), 'days') > 0;
 
     const showUnreadIndicator =
+        !isSelf &&
         index < events.length - 1 &&
-        eventReadUpToId &&
-        eventReadUpToId === event.getId();
+        event.getId() &&
+        eventReadUpTo &&
+        eventReadUpTo.getId() &&
+        eventReadUpTo.getId() === event.getId();
 
     const fetchReactionsHandler = useMutation({
         mutationFn: async () => {
@@ -79,6 +83,20 @@ export const useEventListItem = ({
         },
     });
 
+    const resendEvent = async () => {
+        if (!room) {
+            return;
+        }
+
+        await matrixClient.resendEvent(event, room);
+    };
+
+    const sendReadReceipt = async () => {
+        if (!eventReadUpTo || event.getTs() > eventReadUpTo.getTs()) {
+            matrixClient.sendReadReceipt(event);
+        }
+    };
+
     useEffect(
         () => {
             fetchReactionsHandler.mutate();
@@ -95,5 +113,7 @@ export const useEventListItem = ({
         showUnreadIndicator,
         reactions,
         sendReactionHandler,
+        resendEvent,
+        sendReadReceipt,
     };
 };
