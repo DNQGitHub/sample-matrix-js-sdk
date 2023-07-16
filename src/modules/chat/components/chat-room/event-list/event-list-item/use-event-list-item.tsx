@@ -92,9 +92,15 @@ export const useEventListItem = ({
     };
 
     const sendReadReceipt = async () => {
-        if (!eventReadUpTo || event.getTs() > eventReadUpTo.getTs()) {
-            matrixClient.sendReadReceipt(event);
+        if (event.status) {
+            return;
         }
+
+        if (eventReadUpTo && eventReadUpTo.getTs() > event.getTs()) {
+            return;
+        }
+
+        matrixClient.sendReadReceipt(event);
     };
 
     useEffect(
