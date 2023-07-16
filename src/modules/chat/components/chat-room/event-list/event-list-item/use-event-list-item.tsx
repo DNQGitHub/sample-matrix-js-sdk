@@ -106,6 +106,18 @@ export const useEventListItem = ({
     useEffect(
         () => {
             fetchReactionsHandler.mutate();
+
+            const handleEventUpdated = () => {
+                fetchReactionsHandler.mutate();
+            };
+
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            event.on<any>('event.updated', handleEventUpdated);
+
+            return () => {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                event.off<any>('event.updated', handleEventUpdated);
+            };
         },
         // eslint-disable-next-line react-hooks/exhaustive-deps
         []

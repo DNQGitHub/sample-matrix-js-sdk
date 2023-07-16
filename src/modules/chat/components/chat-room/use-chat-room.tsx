@@ -1,4 +1,10 @@
-import { MatrixEvent, Room, RoomEvent } from 'matrix-js-sdk';
+import {
+    ClientEvent,
+    EventType,
+    MatrixEvent,
+    Room,
+    RoomEvent,
+} from 'matrix-js-sdk';
 import { useEffect, useState } from 'react';
 import { useMutation } from 'react-query';
 import { matrixClient } from '~/modules/matrix/matrix-client';
@@ -14,6 +20,10 @@ export const useChatRoom = ({ roomId }: UseChatRoomProps) => {
 
     const initializeHandler = useMutation({
         mutationFn: async () => {
+            if (!roomId) {
+                return;
+            }
+
             const room = matrixClient.getRoom(roomId);
 
             if (!room) {
@@ -61,6 +71,29 @@ export const useChatRoom = ({ roomId }: UseChatRoomProps) => {
             }
         };
 
+        const handleRoomEvent = (event: MatrixEvent) => {
+            if (event.getType() === EventType.Reaction) {
+                const relatedEventId =
+                    event.getContent()['m.relates_to']?.event_id;
+
+                const foundEvent = room
+                    ?.getLiveTimeline()
+                    .getEvents()
+                    .find((e) => {
+                        const eventId = e.getId();
+                        return (
+                            eventId &&
+                            relatedEventId &&
+                            eventId === relatedEventId
+                        );
+                    });
+                // console.log({foundEvent: foundEvent?.getContent()});
+
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                foundEvent?.emit<any>('event.updated');
+            }
+        };
+
         if (room) {
             setEvents([
                 ...room.getLiveTimeline().getEvents(),
@@ -70,10 +103,12 @@ export const useChatRoom = ({ roomId }: UseChatRoomProps) => {
 
         matrixClient.on(RoomEvent.Timeline, handleRoomTimeline);
         matrixClient.on(RoomEvent.LocalEchoUpdated, handleRoomTimeline);
+        matrixClient.on(ClientEvent.Event, handleRoomEvent);
 
         return () => {
             matrixClient.off(RoomEvent.Timeline, handleRoomTimeline);
             matrixClient.off(RoomEvent.LocalEchoUpdated, handleRoomTimeline);
+            matrixClient.off(ClientEvent.Event, handleRoomEvent);
         };
     }, [room]);
 
