@@ -4,6 +4,7 @@ import { matrixClient } from '~/modules/matrix/matrix-client';
 import { useChatRoomContext } from '../../chat-room-context';
 import { useMutation } from 'react-query';
 import { useEffect, useState } from 'react';
+import { EVENT_UPDATE_REQUESTED } from '~/modules/matrix/constants';
 
 export type UseEventListItemProps = {
     event: MatrixEvent;
@@ -107,16 +108,16 @@ export const useEventListItem = ({
         () => {
             fetchReactionsHandler.mutate();
 
-            const handleEventUpdated = () => {
+            const handleUpdateEvent = () => {
                 fetchReactionsHandler.mutate();
             };
 
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            event.on<any>('event.updated', handleEventUpdated);
+            event.on<any>(EVENT_UPDATE_REQUESTED, handleUpdateEvent);
 
             return () => {
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                event.off<any>('event.updated', handleEventUpdated);
+                event.off<any>(EVENT_UPDATE_REQUESTED, handleUpdateEvent);
             };
         },
         // eslint-disable-next-line react-hooks/exhaustive-deps

@@ -7,6 +7,8 @@ import {
 } from 'matrix-js-sdk';
 import { useEffect, useState } from 'react';
 import { useMutation } from 'react-query';
+import { ALLOW_VISIBLE_EVENT_TYPES } from '~/modules/matrix/configs';
+import { EVENT_UPDATE_REQUESTED } from '~/modules/matrix/constants';
 import { matrixClient } from '~/modules/matrix/matrix-client';
 
 export type UseChatRoomProps = {
@@ -40,7 +42,15 @@ export const useChatRoom = ({ roomId }: UseChatRoomProps) => {
                 const eventReadUpTo = room
                     .getLiveTimeline()
                     .getEvents()
-                    .find((e) => e.getId() === eventReadUpToId);
+                    .filter((e) =>
+                        ALLOW_VISIBLE_EVENT_TYPES.includes(e.getType())
+                    )
+                    .find((e, index, events) => {
+                        return (
+                            index < events.length - 1 &&
+                            e.getId() === eventReadUpToId
+                        );
+                    });
 
                 setEventReadUpTo(eventReadUpTo);
             }
@@ -65,7 +75,12 @@ export const useChatRoom = ({ roomId }: UseChatRoomProps) => {
         const handleRoomTimeline = (_: MatrixEvent, _room?: Room) => {
             if (room && _room && room.roomId === _room.roomId) {
                 setEvents([
-                    ..._room.getLiveTimeline().getEvents(),
+                    ..._room
+                        .getLiveTimeline()
+                        .getEvents()
+                        .filter((e) =>
+                            ALLOW_VISIBLE_EVENT_TYPES.includes(e.getType())
+                        ),
                     ..._room.getPendingEvents(),
                 ]);
             }
@@ -79,6 +94,9 @@ export const useChatRoom = ({ roomId }: UseChatRoomProps) => {
                 const foundEvent = room
                     ?.getLiveTimeline()
                     .getEvents()
+                    .filter((e) =>
+                        ALLOW_VISIBLE_EVENT_TYPES.includes(e.getType())
+                    )
                     .find((e) => {
                         const eventId = e.getId();
                         return (
@@ -87,16 +105,20 @@ export const useChatRoom = ({ roomId }: UseChatRoomProps) => {
                             eventId === relatedEventId
                         );
                     });
-                // console.log({foundEvent: foundEvent?.getContent()});
 
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                foundEvent?.emit<any>('event.updated');
+                foundEvent?.emit<any>(EVENT_UPDATE_REQUESTED);
             }
         };
 
         if (room) {
             setEvents([
-                ...room.getLiveTimeline().getEvents(),
+                ...room
+                    .getLiveTimeline()
+                    .getEvents()
+                    .filter((e) =>
+                        ALLOW_VISIBLE_EVENT_TYPES.includes(e.getType())
+                    ),
                 ...room.getPendingEvents(),
             ]);
         }
