@@ -90,20 +90,26 @@ export class MatrixClient extends BaseMatrixClient {
         timeout = 30000
     ): Promise<Room | null> {
         return new Promise((resolve, reject) => {
-            if (!roomId) return resolve(null);
+            if (!roomId) {
+                return resolve(null);
+            }
 
-            let room: Room | null = null;
             const startTime = Date.now();
+            const interval = setInterval(() => {
+                const room = this.getRoom(roomId);
 
-            do {
-                if (Date.now() - startTime > timeout) {
-                    return reject(`Timeout, cannot get room with id ${roomId}`);
+                if (room) {
+                    clearInterval(interval);
+                    resolve(room);
+                    return;
                 }
 
-                room = this.getRoom(roomId);
-            } while (room === null);
-
-            return resolve(room);
+                if (Date.now() - startTime > timeout) {
+                    clearInterval(interval);
+                    reject(`Timeout, cannot get room with id ${roomId}`);
+                    return;
+                }
+            }, 1000);
         });
     }
 
