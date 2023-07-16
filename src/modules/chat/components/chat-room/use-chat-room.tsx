@@ -74,15 +74,14 @@ export const useChatRoom = ({ roomId }: UseChatRoomProps) => {
     useEffect(() => {
         const handleRoomTimeline = (_: MatrixEvent, _room?: Room) => {
             if (room && _room && room.roomId === _room.roomId) {
-                setEvents([
-                    ..._room
-                        .getLiveTimeline()
-                        .getEvents()
-                        .filter((e) =>
-                            ALLOW_VISIBLE_EVENT_TYPES.includes(e.getType())
-                        ),
-                    ..._room.getPendingEvents(),
-                ]);
+                setEvents(
+                    [
+                        ..._room.getLiveTimeline().getEvents(),
+                        ..._room.getPendingEvents(),
+                    ].filter((e) =>
+                        ALLOW_VISIBLE_EVENT_TYPES.includes(e.getType())
+                    )
+                );
             }
         };
 
@@ -112,15 +111,12 @@ export const useChatRoom = ({ roomId }: UseChatRoomProps) => {
         };
 
         if (room) {
-            setEvents([
-                ...room
-                    .getLiveTimeline()
-                    .getEvents()
-                    .filter((e) =>
-                        ALLOW_VISIBLE_EVENT_TYPES.includes(e.getType())
-                    ),
-                ...room.getPendingEvents(),
-            ]);
+            setEvents(
+                [
+                    ...room.getLiveTimeline().getEvents(),
+                    ...room.getPendingEvents(),
+                ].filter((e) => ALLOW_VISIBLE_EVENT_TYPES.includes(e.getType()))
+            );
         }
 
         matrixClient.on(RoomEvent.Timeline, handleRoomTimeline);
