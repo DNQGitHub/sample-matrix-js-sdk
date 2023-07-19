@@ -2,10 +2,16 @@ import { useState } from 'react';
 import { Button, Flex, TextInput } from '@mantine/core';
 import { useMessageInput } from './use-message-input';
 import { MessageInputContext } from './message-input-context';
+import { useChatRoomContext } from '../chat-room-context';
 
 export const MessageInput = () => {
+    const { room } = useChatRoomContext();
     const [text, setText] = useState('');
     const { sendTextMessage } = useMessageInput();
+
+    if (room?.getMyMembership() !== 'join') {
+        return null;
+    }
 
     return (
         <MessageInputContext.Provider

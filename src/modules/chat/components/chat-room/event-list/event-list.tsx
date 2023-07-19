@@ -15,11 +15,7 @@ export const EventList = () => {
                 transform: 'scaleY(-1)',
             }}
         >
-            <Stack
-                style={{
-                    transform: 'scaleY(-1)',
-                }}
-            >
+            <Stack style={{ transform: 'scaleY(-1)' }}>
                 <Button onClick={scrollBack}>Load previous</Button>
 
                 {events.map((e, index, events) => (

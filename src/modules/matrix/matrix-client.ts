@@ -54,8 +54,8 @@ export class MatrixClient extends BaseMatrixClient {
         return new Promise((resolve, reject) => {
             this.once(ClientEvent.Sync, (state, _, data) => {
                 if (state === SyncState.Error) {
-                    reject(`Sync failed: ${data?.error}`);
-                    console.log('[MatrixClient]: sync failed');
+                    reject(data?.error);
+                    console.log('[MatrixClient]: sync failed: ', data?.error);
                     return;
                 }
 

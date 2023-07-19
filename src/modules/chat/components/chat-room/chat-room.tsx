@@ -4,6 +4,7 @@ import { ChatRoomContext } from './chat-room-context';
 import { EventList as MessageList } from './event-list/event-list';
 import { RoomInfo } from './room-info/room-info';
 import { MessageInput } from './message-input/message-input';
+import { MembershipInfo } from './membership-info/membership-info';
 
 export type ChatRoomProps = {
     roomId?: string;
@@ -52,7 +53,6 @@ export const ChatRoom = ({ roomId, style }: ChatRoomProps) => {
         >
             <Stack
                 p={20}
-                // mah={500}
                 style={{
                     border: '1px solid black',
                     borderRadius: 8,
@@ -63,6 +63,7 @@ export const ChatRoom = ({ roomId, style }: ChatRoomProps) => {
                 <RoomInfo />
                 <MessageList />
                 <MessageInput />
+                <MembershipInfo />
             </Stack>
         </ChatRoomContext.Provider>
     );

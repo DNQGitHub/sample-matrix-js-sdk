@@ -49,13 +49,13 @@ export class AuthService {
     async logout() {
         this.chatGmAxiosService.ejectAccessToken();
 
-        await matrixClient.logout(true);
+        useChatGmAuthStore.getState().setAuthUser(undefined);
+        useMatrixAuthStore.getState().setAuthUser(undefined);
+
+        await resolvePromise(matrixClient.logout(true));
         matrixClient.removeAllListeners();
         matrixClient.stopClient();
 
         await resolvePromise(matrixClient.clearStores());
-
-        useChatGmAuthStore.getState().setAuthUser(undefined);
-        useMatrixAuthStore.getState().setAuthUser(undefined);
     }
 }
