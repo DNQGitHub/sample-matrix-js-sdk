@@ -1,13 +1,13 @@
-import { Flex, Stack, Text } from '@mantine/core';
-import { useChatRoomContext } from '../chat-room-context';
+import { Flex, Stack, Text } from "@mantine/core";
+import { useRoomStateContext } from "../chat-room/contexts/room-state-context/room-state-context";
 
 export const RoomInfo = () => {
-    const { room } = useChatRoomContext();
+    const { room } = useRoomStateContext();
 
+    console.log({ room });
     if (!room) {
         return null;
     }
-
     const roomMembers = room.getMembers().map((m) => m.userId);
 
     return (
@@ -15,11 +15,11 @@ export const RoomInfo = () => {
             p={12}
             style={{
                 gap: 4,
-                border: '1px solid black',
+                border: "1px solid black",
                 borderRadius: 8,
-                whiteSpace: 'pre-wrap',
-                wordWrap: 'break-word',
-                wordBreak: 'break-word',
+                whiteSpace: "pre-wrap",
+                wordWrap: "break-word",
+                wordBreak: "break-word",
             }}
         >
             <Flex gap={8}>

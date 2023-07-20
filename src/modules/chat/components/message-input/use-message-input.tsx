@@ -1,8 +1,8 @@
-import { matrixClient } from '~/modules/matrix/matrix-client';
-import { useChatRoomContext } from '../chat-room-context';
+import { matrixClient } from "~/modules/matrix/matrix-client";
+import { useRoomStateContext } from "../chat-room/contexts/room-state-context/room-state-context";
 
 export const useMessageInput = () => {
-    const { room } = useChatRoomContext();
+    const { room } = useRoomStateContext();
 
     const sendTextMessage = async (text?: string) => {
         if (!text?.trim()) {

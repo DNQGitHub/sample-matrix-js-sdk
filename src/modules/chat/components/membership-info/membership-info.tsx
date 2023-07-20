@@ -1,17 +1,17 @@
-import { Box, Button } from '@mantine/core';
-import { useChatRoomContext } from '../chat-room-context';
-import { useMembershipInfo } from './use-membership-info';
+import { Box, Button } from "@mantine/core";
+import { useRoomStateContext } from "../chat-room/contexts/room-state-context/room-state-context";
+import { useMembershipInfo } from "./use-membership-info";
 
 export const MembershipInfo = () => {
-    const { room } = useChatRoomContext();
+    const { room } = useRoomStateContext();
     const myMembership = room?.getMyMembership();
     const { joinRoomHandler } = useMembershipInfo();
 
-    if (myMembership === 'join') {
+    if (myMembership === "join") {
         return null;
     }
 
-    if (myMembership === 'leave') {
+    if (myMembership === "leave") {
         return null;
     }
 
@@ -19,7 +19,7 @@ export const MembershipInfo = () => {
         <Box
             p={20}
             style={{
-                border: '1px solid black',
+                border: "1px solid black",
                 borderRadius: 8,
             }}
         >

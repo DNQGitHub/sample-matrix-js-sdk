@@ -1,15 +1,15 @@
-import { useState } from 'react';
-import { Button, Flex, TextInput } from '@mantine/core';
-import { useMessageInput } from './use-message-input';
-import { MessageInputContext } from './message-input-context';
-import { useChatRoomContext } from '../chat-room-context';
+import { useState } from "react";
+import { Button, Flex, TextInput } from "@mantine/core";
+import { useMessageInput } from "./use-message-input";
+import { MessageInputContext } from "./message-input-context";
+import { useRoomStateContext } from "../chat-room/contexts/room-state-context/room-state-context";
 
 export const MessageInput = () => {
-    const { room } = useChatRoomContext();
-    const [text, setText] = useState('');
+    const { room } = useRoomStateContext();
+    const [text, setText] = useState("");
     const { sendTextMessage } = useMessageInput();
 
-    if (room?.getMyMembership() !== 'join') {
+    if (room?.getMyMembership() !== "join") {
         return null;
     }
 
@@ -23,7 +23,7 @@ export const MessageInput = () => {
                 p={20}
                 gap={12}
                 style={{
-                    border: '1px solid black',
+                    border: "1px solid black",
                     borderRadius: 8,
                 }}
             >
@@ -35,7 +35,7 @@ export const MessageInput = () => {
 
                 <Button
                     onClick={() => {
-                        sendTextMessage(text).finally(() => setText(''));
+                        sendTextMessage(text).finally(() => setText(""));
                     }}
                 >
                     Send
