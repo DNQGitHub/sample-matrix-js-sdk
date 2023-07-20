@@ -1,9 +1,15 @@
 import { Button, ScrollArea, Stack } from "@mantine/core";
+import { useRoomActionContext } from "../chat-room/contexts/room-action-context/room-action-context";
 import { useRoomStateContext } from "../chat-room/contexts/room-state-context/room-state-context";
 import { EventListItem } from "./event-list-item/event-list-item";
 
 export const EventList = () => {
-    const { events } = useRoomStateContext();
+    const { events, room } = useRoomStateContext();
+    const { scrollback } = useRoomActionContext();
+
+    if (!room) {
+        return null;
+    }
 
     return (
         <ScrollArea
@@ -16,7 +22,7 @@ export const EventList = () => {
             }}
         >
             <Stack style={{ transform: "scaleY(-1)" }}>
-                <Button>Load previous</Button>
+                <Button onClick={scrollback}>Load previous</Button>
 
                 {events.map((e, index, events) => (
                     <EventListItem

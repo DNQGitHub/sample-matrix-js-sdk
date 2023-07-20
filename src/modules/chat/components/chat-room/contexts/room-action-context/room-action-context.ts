@@ -5,6 +5,7 @@ export type RoomActionContextValue = {
     sendTextMessage: (text: string) => Promise<void>;
     resendEvent: (event: MatrixEvent) => Promise<void>;
     reactEvent: (event: MatrixEvent, key: string) => Promise<void>;
+    scrollback: () => Promise<void>;
 };
 
 export const RoomActionContext = createContext({} as RoomActionContextValue);

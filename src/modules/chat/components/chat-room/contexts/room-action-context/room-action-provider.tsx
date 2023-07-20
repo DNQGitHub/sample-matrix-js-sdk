@@ -47,12 +47,21 @@ export const RoomActionProvider = ({ children }: RoomActionProviderProps) => {
         await matrixClient.sendReaction(roomId, eventId, key);
     };
 
+    const scrollback = async () => {
+        if (!room) {
+            throw new Error("room is undefined");
+        }
+
+        await matrixClient.scrollback(room);
+    };
+
     return (
         <RoomActionContext.Provider
             value={{
                 sendTextMessage,
                 resendEvent,
                 reactEvent,
+                scrollback,
             }}
         >
             {children}
