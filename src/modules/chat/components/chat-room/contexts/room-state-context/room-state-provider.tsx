@@ -98,6 +98,7 @@ export const RoomStateProvider = ({
             value={{
                 isLoading: _isLoading,
                 error: _error,
+                roomId,
                 room: _room,
                 events: _events,
                 eventReadUpTo: _eventReadUpTo,

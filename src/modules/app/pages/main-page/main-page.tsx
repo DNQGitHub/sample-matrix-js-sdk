@@ -8,23 +8,25 @@ import { RoomInfo } from "~/modules/chat/components/room-info/room-info";
 import { EventList } from "~/modules/chat/components/event-list/event-list";
 import { MessageInput } from "~/modules/chat/components/message-input/message-input";
 
+const GAP = 20;
+
 export const MainPage = () => {
     const [currentRoom, setCurrentRoom] = useState<Room>();
 
     return (
         <Container>
-            <Stack>
+            <Stack style={{ gap: GAP }}>
                 <LoginForm />
                 <AuthBox />
 
-                <Flex gap={12} align={"stretch"}>
+                <Flex gap={GAP}>
                     <RoomList
                         onRoomSelected={setCurrentRoom}
                         style={{ flex: 3 }}
                     />
 
                     <ChatRoom roomId={currentRoom?.roomId}>
-                        <Stack style={{ flex: 5, gap: 12 }}>
+                        <Stack style={{ flex: 5, gap: GAP }}>
                             <RoomInfo />
                             <EventList />
                             <MessageInput />

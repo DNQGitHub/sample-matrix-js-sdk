@@ -6,6 +6,7 @@ import {
     Text,
     UnstyledButton,
     createStyles,
+    Anchor,
 } from "@mantine/core";
 import dayjs from "dayjs";
 import { EventStatus, MatrixEvent } from "matrix-js-sdk";
@@ -15,6 +16,7 @@ import {
     EMOJIS_MAP,
     EMOJIS_USED_FOR_REACTIONS,
 } from "~/modules/chat/constants";
+import { useRoomActionContext } from "../../chat-room/contexts/room-action-context/room-action-context";
 
 const useStyles = createStyles(() => ({
     container: {
@@ -46,6 +48,8 @@ export const EventListItem = ({ event, index, events }: EventListItemProps) => {
         showSender,
         showUnreadIndicator,
     } = useEventListItem({ event, index, events });
+
+    const { reactEvent, resendEvent } = useRoomActionContext();
 
     return (
         <Stack
@@ -150,7 +154,7 @@ export const EventListItem = ({ event, index, events }: EventListItemProps) => {
                 {EMOJIS_USED_FOR_REACTIONS.map((e, index) => (
                     <UnstyledButton
                         key={`${e.key} - ${index}`}
-                        // onClick={() => sendReactionHandler.mutate(e.key)}
+                        onClick={() => reactEvent(event, e.key)}
                     >
                         <Image
                             src={e.imageUrl}
@@ -170,7 +174,9 @@ export const EventListItem = ({ event, index, events }: EventListItemProps) => {
                 {event.status === EventStatus.NOT_SENT && (
                     <Flex>
                         <Text>
-                            {/* <Anchor onClick={resendEvent}>Resend</Anchor> */}
+                            <Anchor onClick={() => resendEvent(event)}>
+                                Resend
+                            </Anchor>
                             {" - "}
                             {event.status}
                         </Text>

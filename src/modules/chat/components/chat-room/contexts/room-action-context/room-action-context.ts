@@ -1,7 +1,10 @@
+import { MatrixEvent } from "matrix-js-sdk";
 import { createContext, useContext } from "react";
 
 export type RoomActionContextValue = {
     sendTextMessage: (text: string) => Promise<void>;
+    resendEvent: (event: MatrixEvent) => Promise<void>;
+    reactEvent: (event: MatrixEvent, key: string) => Promise<void>;
 };
 
 export const RoomActionContext = createContext({} as RoomActionContextValue);
