@@ -12,7 +12,7 @@ export const EventList = () => {
     const { scrollback } = useRoomActionContext();
 
     useEffect(() => {
-        if (room && events.length > 0) {
+        if (room && events.length > 0 && !didInitialScroll.current) {
             scrollAreaViewPort.current?.scroll({
                 top: scrollAreaViewPort.current.scrollHeight,
             });
