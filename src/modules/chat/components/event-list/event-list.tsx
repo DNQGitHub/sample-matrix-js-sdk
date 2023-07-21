@@ -33,9 +33,18 @@ export const EventList = () => {
                 border: "1px solid black",
                 borderRadius: 8,
             }}
+            styles={{
+                viewport: {
+                    "& > div": {
+                        height: "100%",
+                    },
+                },
+            }}
         >
-            <Stack>
-                <Button onClick={scrollback}>Load previous</Button>
+            <Stack style={{ width: "100%", height: "100%" }}>
+                <Button onClick={scrollback} style={{ marginBottom: "auto" }}>
+                    Load previous
+                </Button>
 
                 {events.map((e, index, events) => (
                     <EventListItem
