@@ -29,7 +29,8 @@ export const MessageInput = () => {
 
             <Button
                 onClick={() => {
-                    sendTextMessage(text).finally(() => setText(""));
+                    sendTextMessage(text);
+                    setText("");
                 }}
             >
                 Send

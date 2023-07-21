@@ -17,6 +17,7 @@ import {
     EMOJIS_USED_FOR_REACTIONS,
 } from "~/modules/chat/constants";
 import { useRoomActionContext } from "../../chat-room/contexts/room-action-context/room-action-context";
+import { useEffect, useRef } from "react";
 
 const useStyles = createStyles(() => ({
     container: {
@@ -51,8 +52,17 @@ export const EventListItem = ({ event, index, events }: EventListItemProps) => {
 
     const { reactEvent, resendEvent } = useRoomActionContext();
 
+    const thiz: React.Ref<HTMLDivElement> = useRef(null);
+
+    useEffect(() => {
+        if (event.status === EventStatus.SENDING) {
+            thiz.current?.scrollIntoView();
+        }
+    }, [event.status]);
+
     return (
         <Stack
+            ref={thiz}
             className={classes.container}
             pos={"relative"}
             style={{
